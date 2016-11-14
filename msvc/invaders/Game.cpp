@@ -48,6 +48,11 @@ void Game::run()
         // changes the game state with new input events
         _input.processWaitingEvents();
 
+        // TODO: desing time eating object to two calls:
+        //   a) update state up to event happened time
+        //   b) process event without moment argument
+        // can collisions be adopted to this?
+
         // update state up to current moment
         _updateStateByTime();
 

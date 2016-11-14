@@ -22,7 +22,9 @@ bool InputController::FireMode::operator==(const FireMode& cmpWith) const
 }
 
 InputController::MoveMode::MoveMode():
-    direction(0)
+    moveToRequested(),
+    moveTo(),
+    direction()
 {}
 
 bool InputController::MoveMode::operator==(const MoveMode& cmpWith) const
