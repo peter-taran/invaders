@@ -47,17 +47,24 @@ struct InputController
     InputController();
 };
 
-typedef function<void(
-    const double moment,
-    const InputController::FireMode& was,
-    const InputController::FireMode& now
-)> FireModeListener;
+template<class State>
+struct Update
+{
+    const double moment;
+    State& now; // handler can change state
 
-typedef function<void(
-    const double moment,
-    const InputController::MoveMode& was,
-    const InputController::MoveMode& now
-)> MoveModeListener;
+    Update(const double moment, State& now):
+        moment(moment), now(now)
+    {}
+};
+
+typedef function<
+    void(const Update<InputController::FireMode>& mode)
+> FireModeListener;
+
+typedef function<
+    void(const Update<InputController::MoveMode>& mode)
+> MoveModeListener;
 
 
 // InputProcessor collect events with it's own background thread

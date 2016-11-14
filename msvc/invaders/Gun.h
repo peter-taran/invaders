@@ -17,10 +17,8 @@ public:
 
 private:
     // listeners
-    void _onChange_fire(const double moment, const InputController::FireMode& was,
-        const InputController::FireMode& now);
-    void _onChange_move(const double moment, const InputController::MoveMode& was,
-        const InputController::MoveMode& now);
+    void _onChange_fire(const Update<InputController::FireMode>& state);
+    void _onChange_move(const Update<InputController::MoveMode>& state);
 
     // consts
     double _positionY;

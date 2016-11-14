@@ -291,7 +291,7 @@ void InputProcessor::_updateState_gunMove(const double moment)
     // TODO: here is problem, we should turn on "moveTo" mode
     // only when mouse moved, but we have no this info
 
-    InputController::MoveMode was = _state.gunMoveMode;
+    const InputController::MoveMode was = _state.gunMoveMode;
     if( _inputState.btnLeft.pressed == _inputState.btnRight.pressed )
     {
         _state.gunMoveMode.direction = 0;
@@ -307,13 +307,13 @@ void InputProcessor::_updateState_gunMove(const double moment)
 
     if( was != _state.gunMoveMode && _onChange_gunMove )
     {
-        _onChange_gunMove(moment, was, _state.gunMoveMode);
+        _onChange_gunMove(Update<InputController::MoveMode>(moment, _state.gunMoveMode));
     }
 }
 
 void InputProcessor::_updateState_gunFire(const double moment)
 {
-    InputController::FireMode was = _state.gunFireMode;
+    const InputController::FireMode was = _state.gunFireMode;
 
     _state.gunFireMode.opened =
         _inputState.btnSpace.pressed ||
@@ -322,6 +322,6 @@ void InputProcessor::_updateState_gunFire(const double moment)
 
     if( was != _state.gunFireMode && _onChange_gunFire )
     {
-        _onChange_gunFire(moment, was, _state.gunFireMode);
+        _onChange_gunFire(Update<InputController::FireMode>(moment, _state.gunFireMode));
     }
 }
