@@ -1,0 +1,152 @@
+﻿Useful Consolas font characters, having symmetry of funny
+http://www.fileformat.info/info/unicode/font/consolas/grid.htm
+
+
+======   ASCII   ======
+
+0
+O o
+
+!
+|
+I
+i
+:
+
+/ \  \ /
+
+V v
+Y
+W w
+U u
+T
+
+( )  ) (
+[ ]  ] [
+{ }  } {
+< >  > <
+
+. _ ~ - = + * ^ " '
+
+X x
+A
+M m
+H
+
+L l
+K
+C
+
+====== Non-ASCII ======
+
+Ö Ô Õ Ō ō Ŏ ŏ    ok
+Ǒ ǒ Ȏ ȏ Ȯ ȯ Ӧ ӧ  not displayed
+Θ θ  ok
+Ø    ok
+ᴓ    not displayed
+Ѻ ѻ  not displayed
+Ϙ ϙ  not displayed
+ƍ    not displayed
+¤    ok
+Ф ф  ok
+ɸ ȹ  not displayed
+ȸ    not displayed
+Ȣ ȣ ᴕ  not displayed
+ɣ ɤ ˠ  not displayed
+ᴥ    not displayed
+ɷ    not displayed
+
+ǂ    not displayed
+¦    ok
+⁞    not displayed
+ǀ    not displayed, use ASCII: |
+ǁ    not displayed
+ǃ    not displayed, use ASCII: !
+¡    ok
+Ĩ Ī Ĭ İ Ї  ok
+Ǐ Ȋ  not displayed
+
+← ↑ → ↓ ↔ ↕ ↨ ∞  ok
+▼ ▲ ► ◄    ok
+▾ ▴ ▸ ◂    not displayed
+
+Ū Ū Ŭ Ů Û Ü Ũ  ok
+Ǔ Ȗ  not displayed
+Ų    ok
+Ʉ    not displayed
+Ʊ ʊ  not displayed
+Ω ∩  ok
+ᴒ ᴖ  not displayed
+ᴗ    not displayed
+Ʌ ʌ ᴧ ᶺ  not displayed
+Δ ∆  ok, second is bigger one
+⌂    ok
+Ȳ    not displayed
+Ψ    ok
+Ŧ    ok
+Ɨ    not displayed
+†    ok
+‡    ok
+Ť    ok
+
+« »  » «
+≤ ≥  ≥ ≤
+
+● ⁃ ˸ ᶺ    not displayed
+○ ◌   not displayed
+▪ ▫ □ not displayed
+
+∞ • · × ± ÷ · º ¨ ¯ °  ok 
+◊ ☼ ♀ ♦ ♠ ♣ ♥  ok
+▬   ok 
+≠   ok
+≈   ok, ASCII pair: ~
+‐ ‒    dashes not displayed
+– — −  ok; last is minus, other dashes
+ₒ ₓ ˽  not displayed; modifiers
+⁄  ASCII: /  division slash
+
+‾―_   ok; horiz bar  X‾‾‾―――___X  buf Consolas has spaces?!
+…‗     ok;  ‗‗‗X … …
+
+box drawings; ok
+┌───┐  ┌─┬─┐
+│ X ├──┤ ┼ ├─
+└───┘  └─┴─┘
+╔═╗
+║ ╠═╣╬
+╚═╝ ╚╩
+╜ ╒ ╓ ╕ ╖ ╘ ╙ ╛ ╞ ╟ ╡ ╢ ╤ ╥ ╦ ╧ ╨ ╪ ╫
+
+X X X X X X X
+X ▀ ▄ ■  █  X  all ok
+X ░ ▒ ▓ ▐ ▌ X
+X ◙ ◘ ◘ ▌ ▐ X
+X X X X X X X
+
+Ȃ          not displayed
+Â Ã Ä Å Ā  ok
+Ħ          ok
+Ξ ≡        ok
+Ш ш        ok
+Ѧ ѧ        not displayed
+Ѫ ѫ        not displayed
+
+☺ ☻        ok
+♀ ♂
+Æ æ
+Ĳ ĳ        ok
+Œ œ
+ſ  ok; but with small dash at left
+Ɩ  not displayed
+Ŀ  ok
+ʟ  not displayed; ASCII: L
+
+Ɔ    not displayed; paired C Ɔ  Ɔ C
+ᴐ    not displayed; c ᴐ  ᴐ c
+Ↄ ↄ  not displayed; same but different
+Ǝ    not displayed; paired Ǝ E  E Ǝ
+
+U+2070, U+2080 super&subscript digits, - = ( ) 
+
+U+2460, U+2770 rounded numbers;  none displayed
