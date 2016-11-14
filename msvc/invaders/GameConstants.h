@@ -2,7 +2,7 @@
 
 
 // fixed FPS
-static const double FPS = 50; // frame/sec
+static const double FPS = 30; // frame/sec
 static const double FRAME_TIME = 1.0 / FPS; // sec
 
 // size of game field

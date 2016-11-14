@@ -25,6 +25,8 @@ Viewport::Console::~Console()
 
 void Viewport::Console::resize(const DisplayCoord& sizes)
 {
+    // TODO: check Windows results for errors, here and everywhere
+
     SetConsoleScreenBufferSize(handle, sizes);
 
     SMALL_RECT rect;
@@ -79,8 +81,7 @@ void Viewport::eraseDrawFrame()
     ci.Attributes = CharAttr();
     //ci.Attributes = _bufferSwitcher == 0 ? CharAttr() : CharAttr(DisplayColor_black, DisplayColor_aqua);
 
-    for(DWORD index = 0; index < _consoleCharCount; ++index)
-        _drawBuff[index] = ci;
+    std::fill(_drawBuff.get(), _drawBuff.get()+_consoleCharCount, ci);
 }
 
 void Viewport::switchFrame()

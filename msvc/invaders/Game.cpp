@@ -64,6 +64,7 @@ void Game::run()
         timers::SleepPrecSec(FRAME_TIME - timer.passedSec());
     }
 
+    _input.nowEnough();
     _viewport.switchDisplay(Viewport::Mode_stdout);
     cout << "Game ended" << endl;
 }

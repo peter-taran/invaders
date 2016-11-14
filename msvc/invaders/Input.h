@@ -10,7 +10,8 @@ struct Shortcut
 {
     WORD virtualKeyCode;
     WORD flags;
-    bool callOnce; // with long press call listener only once; true by default
+    bool callOnce; // call listener only once even when button pressed long time;
+                   // true by default
     ShortcutListener listener;
 
     Shortcut(const WORD virtualKeyCode, const WORD flags,
@@ -31,10 +32,10 @@ struct InputController
 
     struct MoveMode: equality_comparable<MoveMode>
     {
-        bool moveToRequested; // higher priority movement - to position
+        bool moveToRequested; // higher priority motion - to position
         int moveTo; // X-coord
 
-        int direction;
+        int direction; // infinite motion to direction
             // -1: move left
             //  0: stay
             // +1: move right
@@ -47,23 +48,24 @@ struct InputController
     InputController();
 };
 
+// data about controller state update, for listeners
 template<class State>
 struct Update
 {
-    const double moment;
+    const double& moment;
     State& now; // handler can change state
 
-    Update(const double moment, State& now):
+    Update(const double& moment, State& now):
         moment(moment), now(now)
     {}
 };
 
 typedef function<
-    void(const Update<InputController::FireMode>& mode)
+    void(const Update<InputController::FireMode>& state)
 > FireModeListener;
 
 typedef function<
-    void(const Update<InputController::MoveMode>& mode)
+    void(const Update<InputController::MoveMode>& state)
 > MoveModeListener;
 
 
@@ -79,8 +81,8 @@ public:
     void listenGunFireModeChange(FireModeListener listener);
     void listenGunMoveModeChange(MoveModeListener listener);
 
-    void start();
-    void nowEnought(); // signal to stop working; waits for input thread stop
+    void start(); // before start() it just eat events without saving to queue
+    void nowEnough(); // signal to stop working; waits for input thread stop
 
     void processWaitingEvents(); // process and clean queue of events
 
@@ -116,7 +118,7 @@ private:
         ButtonState btnSpace;  // VK_SPACE
     
         ButtonState btnCtrl; // any of Alt buttons
-        ButtonState btnAlt;  // any of Control buttons
+        ButtonState btnAlt;  // any of Ctrl buttons
 
         InputState();
     };

@@ -77,7 +77,7 @@ void InputProcessor::start()
     InterlockedExchange(&_working, 1);
 }
 
-void InputProcessor::nowEnought()
+void InputProcessor::nowEnough()
 {
     InterlockedExchange(&_working, 2);
     _collectThread.join();
@@ -103,6 +103,40 @@ void InputProcessor::listenGunMoveModeChange(MoveModeListener listener)
     _onChange_gunMove = listener;
 }
 
+void InputProcessor::collectCycle()
+{
+    static const DWORD MAX_READ_PORTION = 32;
+    array<INPUT_RECORD, MAX_READ_PORTION> recs;
+
+    while(_working < 2)
+    {
+        // waiting for input events at most FRAME_TIME, next check exit flag
+        if( WAIT_OBJECT_0 ==
+            WaitForSingleObject(_console, static_cast<DWORD>(FRAME_TIME * 1000)) )
+        {
+            // we have events
+            DWORD count = 0;
+            GetNumberOfConsoleInputEvents(_console, &count);
+            const DWORD readCount = (std::min)(MAX_READ_PORTION, count);
+            if( readCount > 0 )
+            {
+                boost::lock_guard<boost::mutex> singlethreaded(_queueAccess);
+                DWORD readedCount = 0;
+                if( ReadConsoleInput(_console, recs.data(), readCount, &readedCount) )
+                {
+                    assert(readedCount <= readCount); // IRL that must be equal
+                    if( _working == 1 )
+                    {
+                        const INPUT_RECORD* const itrEnd = recs.data() + readedCount;
+                        for(const INPUT_RECORD* itr = recs.data(); itr != itrEnd; ++itr)
+                            _queue.push_back(*itr);
+                    }
+                }
+            }
+        }
+    }
+}
+
 void InputProcessor::processWaitingEvents()
 {
     InputEvents events;
@@ -119,39 +153,42 @@ void InputProcessor::processWaitingEvents()
     }
 }
 
-void InputProcessor::collectCycle()
+void InputProcessor::_handleEvent(const InputEvent& e)
 {
-    timers::TicksCvt tcvt;
-
-    while(_working < 2)
+    bool mouseMoved = false;
+    switch(e.rec.EventType)
     {
-        static const DWORD MAX_READ_PORTION = 32;
-        array<INPUT_RECORD, MAX_READ_PORTION> recs;
+    case KEY_EVENT:
+        _handleKeyEvent(e.moment, e.rec.Event.KeyEvent);
+        break;
+    case MOUSE_EVENT:
+        _handleMouseEvent(e.moment, e.rec.Event.MouseEvent, mouseMoved);
+        break;
+    default:
+        return; // ignore everything else
+    }
 
-        // waiting for input events at most FRAME_TIME, next checking exit flag
-        if( WAIT_OBJECT_0 ==
-            WaitForSingleObject(_console, static_cast<DWORD>(FRAME_TIME * 1000)) )
-        {
-            // we have event, collect it
-            DWORD count = 0;
-            GetNumberOfConsoleInputEvents(_console, &count);
-            const DWORD readCount = (std::min)(MAX_READ_PORTION, count);
-            if( readCount > 0 )
-            {
-                boost::lock_guard<boost::mutex> singlethreaded(_queueAccess);
-                DWORD readedCount = 0;
-                if( ReadConsoleInput(_console, recs.data(), readCount, &readedCount) )
-                {
-                    assert(readedCount <= readCount); // really that must be equal
-                    if( _working > 0 )
-                    {
-                        const INPUT_RECORD* const itrEnd = recs.data() + readedCount;
-                        for(const INPUT_RECORD* itr = recs.data(); itr != itrEnd; ++itr)
-                            _queue.push_back(*itr);
-                    }
-                }
-            }
-        }
+    // calculate new controller state and fire listeners when changed
+    _updateState_gunMove(e.moment, mouseMoved);
+    _updateState_gunFire(e.moment);
+}
+
+void InputProcessor::_handleMouseEvent(const double moment,
+    const MOUSE_EVENT_RECORD& rec, bool& mouseMoved)
+{
+    const bool posChanged = (_inputState.mousePos != rec.dwMousePosition);
+    if( posChanged )
+        _inputState.mousePos = rec.dwMousePosition;
+
+    _syncControlButtonStates(rec.dwControlKeyState);
+    _syncMouseButtonStates(rec.dwButtonState);
+
+    switch(rec.dwEventFlags)
+    {
+    case MOUSE_MOVED:
+        mouseMoved = posChanged;
+        break;
+    // case MOUSE_WHEELED: maybe later
     }
 }
 
@@ -176,6 +213,7 @@ void InputProcessor::_syncMouseButtonStates(DWORD mouseButtonsState)
 {
    _syncButtonState(_inputState.btnMouse1,
         0 != (mouseButtonsState & FROM_LEFT_1ST_BUTTON_PRESSED));
+   
    _syncButtonState(_inputState.btnMouse2,
         0 != (mouseButtonsState & RIGHTMOST_BUTTON_PRESSED));
  }
@@ -228,11 +266,11 @@ void InputProcessor::_handleShortcut(const double moment, const KEY_EVENT_RECORD
         if( rec.wVirtualKeyCode != shortcut.virtualKeyCode )
             continue;
 
-        // update button state for future
+        // update button state for now and future
         const bool btnSwitched =
             _syncButtonState(shortcut.btnState, FALSE != rec.bKeyDown);
 
-        // shortcut is a key press
+        // shortcut is a key press, not a key release
         if( !rec.bKeyDown )
             continue;
         
@@ -240,60 +278,21 @@ void InputProcessor::_handleShortcut(const double moment, const KEY_EVENT_RECORD
         if( !shortcut.listener )
             continue;
         
-        // repeat button event?
+        // repeated event about same press?
         if( shortcut.callOnce && !btnSwitched )
             continue;
 
-        // check alt state
+        // check Alt state
         if( (0 != (shortcut.flags & Shortcut_withAlt)) != _inputState.btnAlt.pressed )
             continue;
         
-        // check control state
+        // check Ctrl state
         if( (0 != (shortcut.flags & Shortcut_withCtrl)) != _inputState.btnCtrl.pressed )
             continue;
 
         // this is our shortcut!
         shortcut.listener();
     }
-}
-
-void InputProcessor::_handleMouseEvent(const double moment,
-    const MOUSE_EVENT_RECORD& rec, bool& mouseMoved)
-{
-    const bool posChanged = (_inputState.mousePos != rec.dwMousePosition);
-    if( posChanged )
-        _inputState.mousePos = rec.dwMousePosition;
-
-    _syncControlButtonStates(rec.dwControlKeyState);
-    _syncMouseButtonStates(rec.dwButtonState);
-
-    switch(rec.dwEventFlags)
-    {
-    case MOUSE_MOVED:
-        mouseMoved = posChanged;
-        break;
-    // case MOUSE_WHEELED: maybe later
-    }
-}
-
-void InputProcessor::_handleEvent(const InputEvent& e)
-{
-    bool mouseMoved = false;
-    switch(e.rec.EventType)
-    {
-    case KEY_EVENT:
-        _handleKeyEvent(e.moment, e.rec.Event.KeyEvent);
-        break;
-    case MOUSE_EVENT:
-        _handleMouseEvent(e.moment, e.rec.Event.MouseEvent, mouseMoved);
-        break;
-    default:
-        return; // ignore everything else
-    }
-
-    // calculate new controller state and fire listeners when changed
-    _updateState_gunMove(e.moment, mouseMoved);
-    _updateState_gunFire(e.moment);
 }
 
 void InputProcessor::_updateState_gunMove(const double moment, bool mouseMoveHappened)
