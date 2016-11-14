@@ -19,6 +19,7 @@ Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
     _positionY(0),
     _xrange(),
 
+    _stopMoveX(-1),
     _positionX(0),
     _speed(0),
     _movement(0),
@@ -47,7 +48,7 @@ Gun::~Gun()
 void Gun::drawYourself(Viewport& viewport)
 {
     __super::drawYourself(viewport);
-    viewport.draw(DisplayCoord(_positionX, _positionY),
+    viewport.draw(DisplayCoord(_positionX - 5, _positionY),
         _shooting ? _imageShooting : _image);
 }
 
@@ -61,9 +62,32 @@ void Gun::_onChange_move(const Update<InputController::MoveMode>& state)
 {
     _doMoving(state.moment);
 
-    if( _movement != state.now.direction )
+    int newMovement = state.now.direction;
+    if( state.now.moveToRequested )
     {
-        _movement = state.now.direction;
+        // ignoring small moves
+        const double stopMoveX = static_cast<double>(state.now.moveTo + 0.5);
+
+        const double moveShift = stopMoveX - _positionX;
+        if( abs(moveShift) < 1 )
+        {
+            state.now.moveToRequested = false;
+        }
+        else
+        {
+            newMovement = moveShift < 0 ? -1 : +1;
+            _stopMoveX = stopMoveX;
+        }
+    }
+
+    if( !state.now.moveToRequested )
+    {
+        _stopMoveX = newMovement > 0 ? 1000000 : -1000000;
+    }
+
+    if( _movement != newMovement )
+    {
+        _movement = newMovement;
         _speed = 0;
     }
 }
@@ -100,15 +124,27 @@ void Gun::_doMoving(const double now)
     _prevMoment = now;
 
     // bounds
-    if( _positionX < _xrange.first )
+    pair<double, double> xrange = _xrange;
+    if( _movement < 0 )
     {
-        _positionX = _xrange.first;
+        if( xrange.first < _stopMoveX )
+            xrange.first = _stopMoveX;
+    }
+    else
+    {
+        if( xrange.second > _stopMoveX )
+            xrange.second = _stopMoveX;
+    }
+
+    if( _positionX < xrange.first )
+    {
+        _positionX = xrange.first;
         _speed = 0;
         _movement = 0;
     }
-    else if( _positionX > _xrange.second )
+    else if( _positionX > xrange.second )
     {
-        _positionX = _xrange.second;
+        _positionX = xrange.second;
         _speed = 0;
         _movement = 0;
     }

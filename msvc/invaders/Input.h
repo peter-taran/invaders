@@ -136,7 +136,8 @@ private:
 
     void _handleEvent(const InputEvent& e);
     void _handleKeyEvent(const double moment, const KEY_EVENT_RECORD& rec);
-    void _handleMouseEvent(const double moment, const MOUSE_EVENT_RECORD& rec);
+    void _handleMouseEvent(const double moment, const MOUSE_EVENT_RECORD& rec,
+        bool& mouseMoved);
     
     void _syncControlButtonStates(DWORD controlKeysState);
     void _syncMouseButtonStates(DWORD mouseButtonsState);
@@ -144,7 +145,7 @@ private:
     bool _syncButtonState(ButtonState& btn, bool pressedNow); // true if state changed
 
     MoveModeListener _onChange_gunMove;
-    void _updateState_gunMove(const double moment);
+    void _updateState_gunMove(const double moment, bool mouseMoveHappened);
     
     FireModeListener _onChange_gunFire;
     void _updateState_gunFire(const double moment);

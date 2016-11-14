@@ -256,42 +256,54 @@ void InputProcessor::_handleShortcut(const double moment, const KEY_EVENT_RECORD
 }
 
 void InputProcessor::_handleMouseEvent(const double moment,
-    const MOUSE_EVENT_RECORD& rec)
+    const MOUSE_EVENT_RECORD& rec, bool& mouseMoved)
 {
-    _inputState.mousePos = rec.dwMousePosition;
+    const bool posChanged = (_inputState.mousePos != rec.dwMousePosition);
+    if( posChanged )
+        _inputState.mousePos = rec.dwMousePosition;
 
     _syncControlButtonStates(rec.dwControlKeyState);
     _syncMouseButtonStates(rec.dwButtonState);
 
-    // if we will need mouse wheel, process
-    // rec.dwEventFlags in (MOUSE_HWHEELED, MOUSE_WHEELED)
+    switch(rec.dwEventFlags)
+    {
+    case MOUSE_MOVED:
+        mouseMoved = posChanged;
+        break;
+    // case MOUSE_WHEELED: maybe later
+    }
 }
 
 void InputProcessor::_handleEvent(const InputEvent& e)
 {
+    bool mouseMoved = false;
     switch(e.rec.EventType)
     {
     case KEY_EVENT:
         _handleKeyEvent(e.moment, e.rec.Event.KeyEvent);
         break;
     case MOUSE_EVENT:
-        _handleMouseEvent(e.moment, e.rec.Event.MouseEvent);
+        _handleMouseEvent(e.moment, e.rec.Event.MouseEvent, mouseMoved);
         break;
     default:
         return; // ignore everything else
     }
 
     // calculate new controller state and fire listeners when changed
-    _updateState_gunMove(e.moment);
+    _updateState_gunMove(e.moment, mouseMoved);
     _updateState_gunFire(e.moment);
 }
 
-void InputProcessor::_updateState_gunMove(const double moment)
+void InputProcessor::_updateState_gunMove(const double moment, bool mouseMoveHappened)
 {
-    // TODO: here is problem, we should turn on "moveTo" mode
-    // only when mouse moved, but we have no this info
-
     const InputController::MoveMode was = _state.gunMoveMode;
+
+    if( mouseMoveHappened )
+    {
+        _state.gunMoveMode.moveToRequested = true;
+        _state.gunMoveMode.moveTo = _inputState.mousePos.x;
+    }
+
     if( _inputState.btnLeft.pressed == _inputState.btnRight.pressed )
     {
         _state.gunMoveMode.direction = 0;

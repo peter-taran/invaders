@@ -25,6 +25,7 @@ private:
     pair<double, double> _xrange;
 
     // current state
+    double _stopMoveX;
     double _positionX;
     int _movement;
     double _speed;
