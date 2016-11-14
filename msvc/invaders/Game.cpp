@@ -8,7 +8,9 @@ Game::Game():
     _viewportSize(GAME_FIELD_SIZE),
     _input(),
     _statusLine(_viewportSize),
-    _spaag(_viewportSize)
+    _gun(_input, _viewportSize),
+
+    _exitGameSignal(false)
 {
     _viewport.resize(_viewportSize);
 }
@@ -16,24 +18,38 @@ Game::Game():
 Game::~Game()
 {}
 
+void Game::_init()
+{
+    // all shortcuts ending the game
+    _input.listenShortcut(
+        Shortcut(VK_F4, Shortcut_withAlt, bind(&Game::_onExitGame, this)));
+    _input.listenShortcut(
+        Shortcut('X', Shortcut_withAlt, bind(&Game::_onExitGame, this)));
+    _input.listenShortcut(
+        Shortcut('Q', Shortcut_withAlt, bind(&Game::_onExitGame, this)));
+    _input.listenShortcut(
+        Shortcut('Q', Shortcut_withCtrl, bind(&Game::_onExitGame, this)));
+}
+
 void Game::run()
 {
+    _init();
+
     cout << "Game started" << endl;
     _viewport.switchDisplay(Viewport::Mode_game);
-
-    // TODO: for debug
-    //_viewport.draw(DisplayCoord(50, 10), Sprite(CROSS, DisplayCoord(), CharAttr(DisplayColor_lightRed, DisplayColor_black)));
-
     _input.start();
 
     // Frame cycle
-    for(;;)
+    timers::TimerEx timer;
+    while(!_exitGameSignal)
     {
-        timers::TimerEx timer;
+        timer.reset();
 
-        // changes the game state with new input
-        if( _changeState() )
-            break;
+        // changes the game state with new input events
+        _input.processWaitingEvents();
+
+        // update state up to current moment
+        _updateStateByTime();
 
         // builds and displays new frame
         _buildFrame();
@@ -47,23 +63,17 @@ void Game::run()
     cout << "Game ended" << endl;
 }
 
-bool Game::_changeState()
+void Game::_onExitGame()
 {
-    Commands commands = _input.popCommands();
+    _exitGameSignal = true;
+}
 
-    foreach(const Command& cmd, commands)
-    {
-        if( cmd.command == Command_exitGame )
-            return true;
-        
-        _statusLine.processCommand(cmd);
-        _spaag.processCommand(cmd);
-    }
+void Game::_updateStateByTime()
+{
+    const double now = g_now.sec();
 
-    const Command commandAtEndOfFrame(timers::Now().sec(), Command_none);
-    _spaag.processCommand(commandAtEndOfFrame);
-
-    return false;
+    _statusLine.updateStateByTime(now);
+    _gun.updateStateByTime(now);
 }
 
 void Game::_buildFrame()
@@ -71,7 +81,7 @@ void Game::_buildFrame()
     _viewport.eraseDrawFrame();
 
     _statusLine.drawYourself(_viewport);
-    _spaag.drawYourself(_viewport);
+    _gun.drawYourself(_viewport);
 
     _viewport.switchFrame();
 }

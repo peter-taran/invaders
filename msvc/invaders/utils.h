@@ -15,3 +15,5 @@ void zeroVar(Variable& variable)
 
 void __declspec(noreturn) unreachable(const char* codePlaceID);
 
+// timer to get current moment anywhere
+extern timers::Now g_now;

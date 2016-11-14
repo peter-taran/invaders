@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InputController.h"
+#include "Input.h"
 
 
 class Displayable: noncopyable
@@ -10,8 +10,7 @@ public:
     virtual ~Displayable();
 
     virtual void drawYourself(class Viewport& viewport);
-
-    virtual void processCommand(const Command& cmd);
+    virtual void updateStateByTime(const double moment);
 };
 
 // collection of Displayable objects

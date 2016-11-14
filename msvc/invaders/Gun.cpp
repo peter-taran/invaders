@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Gun.h"
 #include "Viewport.h"
-#include "InputController.h"
 #include "GameConstants.h"
 
 
@@ -16,17 +15,23 @@ static const array<wstring, 3> IMAGE = {
     L"[==••••==]",
 };
 
-Gun::Gun(const DisplayCoord& viewportSize):
+Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
     _positionY(0),
     _xrange(),
 
     _positionX(0),
     _speed(0),
-    _movement(Command_none),
+    _movement(0),
     _prevMoment(0),
 
-    _image(IMAGE)
+    _image(IMAGE),
+
+    _shooting(false),
+    _imageShooting(IMAGE, CharAttr(DisplayColor_lightRed, DisplayColor_black))
 {
+    input.listenGunMoveModeChange(bind(&Gun::_onChange_move, this, _1, _2, _3));
+    input.listenGunFireModeChange(bind(&Gun::_onChange_fire, this, _1, _2, _3));
+
     const double gunWidth = _image.size().x;
 
     _xrange.first = (gunWidth / 2);
@@ -42,18 +47,39 @@ Gun::~Gun()
 void Gun::drawYourself(Viewport& viewport)
 {
     __super::drawYourself(viewport);
-    viewport.draw(DisplayCoord(_positionX, _positionY), _image);
+    viewport.draw(DisplayCoord(_positionX, _positionY),
+        _shooting ? _imageShooting : _image);
+}
+
+void Gun::_onChange_fire(const double moment, const InputController::FireMode& was,
+    const InputController::FireMode& now)
+{
+    // TODO: real fire
+    _shooting = now.opened;
+}
+
+void Gun::_onChange_move(const double moment, const InputController::MoveMode& was,
+    const InputController::MoveMode& now)
+{
+    _doMoving(moment);
+
+    if( _movement != now.direction )
+    {
+        _movement = now.direction;
+        _speed = 0;
+    }
 }
 
 void Gun::_doMoving(const double now)
 {
-    if( _movement == Command_none )
+    if( _movement == 0 )
+    {
+        _prevMoment = now;
         return;
+    }
     
     // uniform component of motion
-    _positionX +=
-        (_movement == Command_moveLeft ? -_speed : +_speed)
-        * (now - _prevMoment);
+    _positionX += (_movement * _speed) * (now - _prevMoment);
 
     // accelerated component of motion
     if( _speed < SPAAG_MAX_SPEED )
@@ -67,7 +93,7 @@ void Gun::_doMoving(const double now)
             * speedUpPeriod;
         _speed += speedAdd;
 
-        if( _movement == Command_moveLeft )
+        if( _movement < 0 )
             speedAdd = -speedAdd;
         _positionX += // a * t^2 / 2
             speedAdd * speedUpPeriod / 2;
@@ -80,37 +106,18 @@ void Gun::_doMoving(const double now)
     {
         _positionX = _xrange.first;
         _speed = 0;
-        _movement = Command_none;
+        _movement = 0;
     }
     else if( _positionX > _xrange.second )
     {
         _positionX = _xrange.second;
         _speed = 0;
-        _movement = Command_none;
+        _movement = 0;
     }
 }
 
-void Gun::processCommand(const Command& cmd)
+void Gun::updateStateByTime(const double moment)
 {
-    __super::processCommand(cmd);
-
-    _doMoving(cmd.moment);
-
-    switch(cmd.command)
-    {
-    case Command_moveStop:
-        _speed = 0;
-        _movement = Command_none;
-        break;
-    case Command_moveLeft:
-        _speed = 0;
-        _movement = Command_moveLeft;
-        _prevMoment = cmd.moment;
-        break;
-    case Command_moveRight:
-        _speed = 0;
-        _movement = Command_moveRight;
-        _prevMoment = cmd.moment;
-        break;
-    }
+    __super::updateStateByTime(moment);
+    _doMoving(moment);
 }

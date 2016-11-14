@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Viewport.h"
-#include "InputController.h"
+#include "Input.h"
 #include "Gun.h"
 #include "StatusLine.h"
 
@@ -18,12 +18,16 @@ private:
     const DisplayCoord _viewportSize;
     Viewport _viewport;
     
-    InputController _input;
+    InputProcessor _input;
 
     StatusLine _statusLine;
-    Gun _spaag; // gun
+    Gun _gun; // gun
 
-    bool _changeState();
+    void _init();
     void _buildFrame();
+    void _updateStateByTime();
+
+    bool _exitGameSignal;
+    void _onExitGame();
 };
 

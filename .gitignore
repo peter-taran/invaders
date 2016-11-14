@@ -23,12 +23,14 @@ $RECYCLE.BIN/
 *.dll
 *.suo
 *.sdf
+*.opensdf
 *.log
 *.tlog
 *.ilk
 *.idb
 *.pdb
 *.pch
+*.ipch
 *.lastbuildstate
 
 # =========================

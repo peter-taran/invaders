@@ -46,6 +46,12 @@ using boost::thread;
 #include <boost/function.hpp>
 using boost::function;
 
+#include <boost/bind.hpp>
+using boost::bind;
+
+#include <boost/operators.hpp>
+using boost::equality_comparable;
+
 #include <boost/array.hpp>
 using boost::array;
 
@@ -62,6 +68,6 @@ using std::list;
 using std::wstring;
 using std::string;
 
-#include "utils.h"
 #include "timers.h"
+#include "utils.h"
 #include "Basic.h"

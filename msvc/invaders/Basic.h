@@ -9,7 +9,7 @@ inline int physToDisp(const double coord)
 
 
 // Coordinates or sizes of something displayable
-struct DisplayCoord
+struct DisplayCoord: equality_comparable<DisplayCoord>
 {
     int x;
     int y;
@@ -25,6 +25,13 @@ struct DisplayCoord
     DisplayCoord(double x, double y):
         x(physToDisp(x)), y(physToDisp(y))
     {}
+
+    DisplayCoord(const COORD& from):
+        x(from.X), y(from.Y)
+    {}
+
+    bool operator==(const DisplayCoord& cmpWith) const
+    { return x == cmpWith.x && y == cmpWith.y; }
 
     COORD asCOORD() const
     {

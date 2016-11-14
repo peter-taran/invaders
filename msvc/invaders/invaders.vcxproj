@@ -88,7 +88,7 @@
     <ClInclude Include="GameConstants.h" />
     <ClInclude Include="Displayable.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="InputController.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Gun.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StatusLine.h" />
@@ -101,7 +101,7 @@
   <ItemGroup>
     <ClCompile Include="Displayable.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="InputController.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Gun.cpp" />
     <ClCompile Include="Sprite.cpp" />

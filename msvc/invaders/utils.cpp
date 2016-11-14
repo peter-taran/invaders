@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 
+timers::Now g_now;
+
 struct UnreachableException: public std::exception
 {
     UnreachableException(const char* codePlaceID):

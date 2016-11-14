@@ -10,7 +10,7 @@ public:
     ~StatusLine();
 
     virtual void drawYourself(class Viewport& viewport); // override
-    virtual void processCommand(const Command& cmd); // override
+    virtual void updateStateByTime(const double moment); // override
 
 private:
     int _charCount;

@@ -36,7 +36,7 @@ void StatusLine::drawYourself(Viewport& viewport)
     viewport.drawTextLine(score2, DisplayCoord(1, _bottomIndex+2));
 }
 
-void StatusLine::processCommand(const Command& cmd)
+void StatusLine::updateStateByTime(const double moment)
 {
-    __super::processCommand(cmd);
+    __super::updateStateByTime(moment);
 }

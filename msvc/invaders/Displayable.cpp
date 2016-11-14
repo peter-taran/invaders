@@ -14,7 +14,7 @@ void Displayable::drawYourself(Viewport& viewport)
     // nothing by default
 }
 
-void Displayable::processCommand(const Command& cmd)
+void Displayable::updateStateByTime(const double moment)
 {
     // nothing by default
 }
