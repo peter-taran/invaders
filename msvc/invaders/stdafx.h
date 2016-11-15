@@ -58,6 +58,8 @@ using boost::array;
 #include <boost/format.hpp>
 using boost::wformat;
 
+#include <boost/type_traits/is_pod.hpp>
+
 #include <vector>
 using std::vector;
 

@@ -66,7 +66,7 @@ void Gun::commandMove(const Command<InputController::MoveMode>& state)
     if( state.now.moveToRequested )
     {
         // ignoring small moves
-        const double stopMoveX = static_cast<double>(state.now.moveTo + 0.5);
+        const double stopMoveX = dispToPhys(state.now.moveTo);
 
         const double moveShift = stopMoveX - _positionX;
         if( abs(moveShift) < 1 )

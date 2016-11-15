@@ -7,6 +7,14 @@ inline int physToDisp(const double coord)
     return static_cast<int>(coord < 0 ? coord - 0.5 : coord + 0.5);
 }
 
+// Transform display coordinate to "physical"
+// +~0.5 because we suppose display coordinate points to center of character cell
+inline double dispToPhys(const int coord)
+{
+    // why not 0.5? because in this case physToDisp(dispToPhys(100)) == 101
+    return static_cast<double>(coord) + (coord < 0 ? -0.4999999999 : +0.4999999999);
+}
+
 
 // Coordinates or sizes of something displayable
 struct DisplayCoord: equality_comparable<DisplayCoord>

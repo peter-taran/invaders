@@ -53,8 +53,7 @@ void Viewport::resize(const DisplayCoord& size)
     
     _console.resize(size);
     
-    _drawBuff.reset(new CHAR_INFO[_consoleCharCount]);
-    zeroBytes(&_drawBuff[0], &_drawBuff[_consoleCharCount]);
+    allocZeroedArray(_drawBuff, _consoleCharCount);
 }
 
 void Viewport::switchDisplay(Mode mode)
