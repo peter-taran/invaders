@@ -14,8 +14,8 @@ Viewport::~Viewport()
 {}
 
 Viewport::Console::Console():
-    handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL,
-        CONSOLE_TEXTMODE_BUFFER, NULL))
+    handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+        CONSOLE_TEXTMODE_BUFFER, nullptr))
 {}
 
 Viewport::Console::~Console()

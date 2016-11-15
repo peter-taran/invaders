@@ -1,19 +1,18 @@
 #pragma once
 
-#include "Displayable.h"
 #include "Sprite.h"
 #include "Input.h"
 
 
 // self-propelled anti-aircraft gun «Äþáåëü» ("Dubel")
-class Gun: public Displayable
+class Gun: public Drawable, public TimeEater
 {
 public:
     Gun(InputProcessor& input, const DisplayCoord& viewportSize);
     ~Gun();
 
     virtual void drawYourself(class Viewport& viewport); // override
-    virtual void updateStateByTime(const double moment); // override
+    virtual void eatTime(const double from, const double to); // override
 
     // control actions
     void commandFire(const Command<InputController::FireMode>& state);
@@ -29,7 +28,6 @@ private:
     double _positionX;
     int _movement;
     double _speed;
-    double _prevMoment;
     void _doMoving(const double now);
 
     // picture

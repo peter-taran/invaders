@@ -14,8 +14,6 @@ StatusLine::~StatusLine()
 
 void StatusLine::drawYourself(Viewport& viewport)
 {
-    __super::drawYourself(viewport);
-
     //static const wchar_t UPPER_CHAR = L'‗';
     //static const wchar_t UPPER_CHAR = L'▬';
     //static const wchar_t UPPER_CHAR = L'―';
@@ -34,9 +32,4 @@ void StatusLine::drawYourself(Viewport& viewport)
 
     viewport.drawTextLine(score1, DisplayCoord(1, _bottomIndex+1));
     viewport.drawTextLine(score2, DisplayCoord(1, _bottomIndex+2));
-}
-
-void StatusLine::updateStateByTime(const double moment)
-{
-    __super::updateStateByTime(moment);
 }

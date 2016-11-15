@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Game is only one
+//extern class Game* g_gameObject;
+
 // Round "physical" (double) coordinate to display coordinate
 inline int physToDisp(const double coord)
 {
@@ -14,7 +17,6 @@ inline double dispToPhys(const int coord)
     // why not 0.5? because in this case physToDisp(dispToPhys(100)) == 101
     return static_cast<double>(coord) + (coord < 0 ? -0.4999999999 : +0.4999999999);
 }
-
 
 // Coordinates or sizes of something displayable
 struct DisplayCoord: equality_comparable<DisplayCoord>
@@ -124,3 +126,29 @@ private:
     WORD _attrib;
 };
 
+// Some object, processing going of time
+class TimeEater
+{
+protected:
+    virtual void eatTime(const double from, const double to) = 0;
+
+public:
+    TimeEater(WillBeInitedLater);
+    void laterInit(const double& startMoment);
+
+    TimeEater(const double& startMoment);
+
+    double eatenUpTo() const;
+
+    void eatTimeUpTo(const double& moment);
+
+private:
+    double _eatenUpTo;
+};
+
+// Interface to object should be painted
+class Drawable: noncopyable
+{
+public:
+    virtual void drawYourself(class Viewport& viewport) = 0;
+};

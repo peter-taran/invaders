@@ -16,14 +16,15 @@ static const array<wstring, 3> IMAGE = {
 };
 
 Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
-    _positionY(0),
+    TimeEater(willBeInitedLater),
+
+    _positionY(),
     _xrange(),
 
     _stopMoveX(-1),
-    _positionX(0),
-    _speed(0),
-    _movement(0),
-    _prevMoment(0),
+    _positionX(),
+    _movement(),
+    _speed(),
 
     _image(IMAGE),
 
@@ -47,20 +48,21 @@ Gun::~Gun()
 
 void Gun::drawYourself(Viewport& viewport)
 {
-    __super::drawYourself(viewport);
-    viewport.draw(DisplayCoord(_positionX - 5, _positionY),
+    viewport.draw(DisplayCoord(_positionX - 4, _positionY),
         _shooting ? _imageShooting : _image);
 }
 
 void Gun::commandFire(const Command<InputController::FireMode>& state)
 {
+    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
+
     // TODO: real fire
     _shooting = state.now.opened;
 }
 
 void Gun::commandMove(const Command<InputController::MoveMode>& state)
 {
-    _doMoving(state.moment);
+    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
 
     int newMovement = state.now.direction;
     if( state.now.moveToRequested )
@@ -92,23 +94,20 @@ void Gun::commandMove(const Command<InputController::MoveMode>& state)
     }
 }
 
-void Gun::_doMoving(const double now)
+void Gun::eatTime(const double prevMoment, const double now)
 {
     if( _movement == 0 )
-    {
-        _prevMoment = now;
         return;
-    }
     
     // uniform component of motion
-    _positionX += (_movement * _speed) * (now - _prevMoment);
+    _positionX += (_movement * _speed) * (now - prevMoment);
 
     // accelerated component of motion
     if( _speed < SPAAG_MAX_SPEED )
     {
         const double speedUpRestPerc = (SPAAG_MAX_SPEED - _speed) / SPAAG_MAX_SPEED;
-        const double speedUpMoment = _prevMoment + (SPAAG_SPEEDUP_TIME * speedUpRestPerc);
-        const double speedUpPeriod = (std::min)(speedUpMoment, now) - _prevMoment;
+        const double speedUpMoment = prevMoment + (SPAAG_SPEEDUP_TIME * speedUpRestPerc);
+        const double speedUpPeriod = (std::min)(speedUpMoment, now) - prevMoment;
 
         double speedAdd =
             (SPAAG_MAX_SPEED / SPAAG_SPEEDUP_TIME) // acceleration
@@ -120,8 +119,6 @@ void Gun::_doMoving(const double now)
         _positionX += // a * t^2 / 2
             speedAdd * speedUpPeriod / 2;
     }
-
-    _prevMoment = now;
 
     // bounds
     pair<double, double> xrange = _xrange;
@@ -148,10 +145,4 @@ void Gun::_doMoving(const double now)
         _speed = 0;
         _movement = 0;
     }
-}
-
-void Gun::updateStateByTime(const double moment)
-{
-    __super::updateStateByTime(moment);
-    _doMoving(moment);
 }

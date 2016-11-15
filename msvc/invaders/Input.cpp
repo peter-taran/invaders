@@ -140,7 +140,7 @@ void InputProcessor::collectCycle()
 void InputProcessor::processWaitingEvents()
 {
     InputEvents events;
-    events.reserve(32);
+    events.reserve(64);
 
     {
         boost::lock_guard<boost::mutex> singlethreaded(_queueAccess);
@@ -220,7 +220,7 @@ void InputProcessor::_syncMouseButtonStates(DWORD mouseButtonsState)
 
 bool InputProcessor::_syncFiredButtonState(const KEY_EVENT_RECORD& rec)
 {
-    ButtonState* btn = NULL;
+    ButtonState* btn = nullptr;
     switch(rec.wVirtualKeyCode)
     {
     case VK_LEFT:  btn = &_inputState.btnLeft; break;

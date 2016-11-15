@@ -34,6 +34,12 @@ using boost::scoped_ptr;
 #include <boost/scoped_array.hpp>
 using boost::scoped_array;
 
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+
+#include <boost/weak_ptr.hpp>
+using boost::weak_ptr;
+
 #include <boost/static_assert.hpp>
 #define compile_assert BOOST_STATIC_ASSERT
 
@@ -65,6 +71,9 @@ using std::vector;
 
 #include <list>
 using std::list;
+
+#include <deque>
+using std::deque;
 
 #include <string>
 using std::wstring;
