@@ -134,13 +134,13 @@ protected:
 
 public:
     TimeEater(WillBeInitedLater);
-    void laterInit(const double& startMoment);
+    void laterInit(const double startMoment);
 
-    TimeEater(const double& startMoment);
+    TimeEater(const double startMoment);
 
     double eatenUpTo() const;
 
-    void eatTimeUpTo(const double& moment);
+    void eatTimeUpTo(const double moment);
 
 private:
     double _eatenUpTo;

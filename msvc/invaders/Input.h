@@ -55,7 +55,7 @@ struct Command
     const double moment; // moment of order
     State& now; // handler can change state
 
-    Command(const double& moment, State& now):
+    Command(const double moment, State& now):
         moment(moment), now(now)
     {}
 };

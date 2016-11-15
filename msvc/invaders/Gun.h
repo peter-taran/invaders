@@ -24,11 +24,9 @@ private:
     pair<double, double> _xrange;
 
     // current state
-    double _stopMoveX;
+    double _stopMotionAtX;
     double _positionX;
-    int _movement;
-    double _speed;
-    void _doMoving(const double now);
+    scoped_ptr<class MotionWalls1D> _motion;
 
     // picture
     Sprite _image;
