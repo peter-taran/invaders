@@ -5,7 +5,7 @@
 #include "Input.h"
 
 
-// self-propelled anti-aircraft gun
+// self-propelled anti-aircraft gun «Äþáåëü» ("Dubel")
 class Gun: public Displayable
 {
 public:
@@ -15,11 +15,11 @@ public:
     virtual void drawYourself(class Viewport& viewport); // override
     virtual void updateStateByTime(const double moment); // override
 
-private:
-    // listeners
-    void _onChange_fire(const Update<InputController::FireMode>& state);
-    void _onChange_move(const Update<InputController::MoveMode>& state);
+    // control actions
+    void commandFire(const Command<InputController::FireMode>& state);
+    void commandMove(const Command<InputController::MoveMode>& state);
 
+private:
     // consts
     double _positionY;
     pair<double, double> _xrange;

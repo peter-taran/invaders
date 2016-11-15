@@ -48,24 +48,24 @@ struct InputController
     InputController();
 };
 
-// data about controller state update, for listeners
+// player request of doing anything
 template<class State>
-struct Update
+struct Command
 {
-    const double& moment;
+    const double moment; // moment of order
     State& now; // handler can change state
 
-    Update(const double& moment, State& now):
+    Command(const double& moment, State& now):
         moment(moment), now(now)
     {}
 };
 
 typedef function<
-    void(const Update<InputController::FireMode>& state)
+    void(const Command<InputController::FireMode>& state)
 > FireModeListener;
 
 typedef function<
-    void(const Update<InputController::MoveMode>& state)
+    void(const Command<InputController::MoveMode>& state)
 > MoveModeListener;
 
 

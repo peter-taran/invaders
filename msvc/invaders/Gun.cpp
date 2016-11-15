@@ -30,8 +30,8 @@ Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
     _shooting(false),
     _imageShooting(IMAGE, CharAttr(DisplayColor_lightRed, DisplayColor_black))
 {
-    input.listenGunMoveModeChange(bind(&Gun::_onChange_move, this, _1));
-    input.listenGunFireModeChange(bind(&Gun::_onChange_fire, this, _1));
+    input.listenGunMoveModeChange(bind(&Gun::commandMove, this, _1));
+    input.listenGunFireModeChange(bind(&Gun::commandFire, this, _1));
 
     const double gunWidth = _image.size().x;
 
@@ -52,13 +52,13 @@ void Gun::drawYourself(Viewport& viewport)
         _shooting ? _imageShooting : _image);
 }
 
-void Gun::_onChange_fire(const Update<InputController::FireMode>& state)
+void Gun::commandFire(const Command<InputController::FireMode>& state)
 {
     // TODO: real fire
     _shooting = state.now.opened;
 }
 
-void Gun::_onChange_move(const Update<InputController::MoveMode>& state)
+void Gun::commandMove(const Command<InputController::MoveMode>& state)
 {
     _doMoving(state.moment);
 

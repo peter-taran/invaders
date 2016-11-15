@@ -320,7 +320,7 @@ void InputProcessor::_updateState_gunMove(const double moment, bool mouseMoveHap
 
     if( was != _state.gunMoveMode && _onChange_gunMove )
     {
-        _onChange_gunMove(Update<InputController::MoveMode>(moment, _state.gunMoveMode));
+        _onChange_gunMove(Command<InputController::MoveMode>(moment, _state.gunMoveMode));
     }
 }
 
@@ -335,6 +335,6 @@ void InputProcessor::_updateState_gunFire(const double moment)
 
     if( was != _state.gunFireMode && _onChange_gunFire )
     {
-        _onChange_gunFire(Update<InputController::FireMode>(moment, _state.gunFireMode));
+        _onChange_gunFire(Command<InputController::FireMode>(moment, _state.gunFireMode));
     }
 }
