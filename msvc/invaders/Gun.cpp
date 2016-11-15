@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Gun.h"
 #include "Viewport.h"
+#include "Kinetic.h"
 #include "GameConstants.h"
 
 
@@ -16,22 +17,22 @@ static const array<wstring, 3> IMAGE = {
 };
 
 Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
-    _positionY(0),
+    TimeEater(willBeInitedLater),
+
+    _positionY(),
     _xrange(),
 
-    _stopMoveX(-1),
-    _positionX(0),
-    _speed(0),
-    _movement(0),
-    _prevMoment(0),
+    _stopMotionAtX(-1),
+    _positionX(),
+    _motion(),
 
     _image(IMAGE),
 
     _shooting(false),
     _imageShooting(IMAGE, CharAttr(DisplayColor_lightRed, DisplayColor_black))
 {
-    input.listenGunMoveModeChange(bind(&Gun::_onChange_move, this, _1));
-    input.listenGunFireModeChange(bind(&Gun::_onChange_fire, this, _1));
+    input.listenGunMoveModeChange(bind(&Gun::commandMove, this, _1));
+    input.listenGunFireModeChange(bind(&Gun::commandFire, this, _1));
 
     const double gunWidth = _image.size().x;
 
@@ -47,111 +48,74 @@ Gun::~Gun()
 
 void Gun::drawYourself(Viewport& viewport)
 {
-    __super::drawYourself(viewport);
-    viewport.draw(DisplayCoord(_positionX - 5, _positionY),
+    viewport.draw(DisplayCoord(_positionX - 4, _positionY),
         _shooting ? _imageShooting : _image);
 }
 
-void Gun::_onChange_fire(const Update<InputController::FireMode>& state)
+void Gun::commandFire(const Command<InputController::FireMode>& state)
 {
+    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
+
     // TODO: real fire
     _shooting = state.now.opened;
 }
 
-void Gun::_onChange_move(const Update<InputController::MoveMode>& state)
+void Gun::commandMove(const Command<InputController::MoveMode>& state)
 {
-    _doMoving(state.moment);
+    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
 
-    int newMovement = state.now.direction;
+    int newDirection = state.now.direction;
+    bool hasMotionBound = false;
+    double motionBound = 0;
+
     if( state.now.moveToRequested )
     {
-        // ignoring small moves
-        const double stopMoveX = static_cast<double>(state.now.moveTo + 0.5);
+        motionBound = dispToPhys(state.now.moveTo);
 
-        const double moveShift = stopMoveX - _positionX;
+        const double moveShift = motionBound - _positionX;
         if( abs(moveShift) < 1 )
         {
+            // ignore small moves
             state.now.moveToRequested = false;
         }
         else
         {
-            newMovement = moveShift < 0 ? -1 : +1;
-            _stopMoveX = stopMoveX;
+            newDirection = moveShift < 0 ? -1 : +1;
+            hasMotionBound = true;
         }
     }
 
-    if( !state.now.moveToRequested )
+    if( (_motion ? _motion->direction(state.moment) : 0) != newDirection )
     {
-        _stopMoveX = newMovement > 0 ? 1000000 : -1000000;
+        if( 0 == newDirection)
+        {
+            _motion.reset();
+        }
+        else
+        {
+            _motion.reset(new MotionWalls1D(
+                new AcceleratedMotion1D(
+                    _positionX, state.moment,
+                    (newDirection > 0 ? GUN_MAX_SPEED : -GUN_MAX_SPEED),
+                    GUN_SPEEDUP_TIME
+            )));
+            _motion->setWalls(_xrange);
+        }
     }
 
-    if( _movement != newMovement )
+    if( hasMotionBound && _motion )
     {
-        _movement = newMovement;
-        _speed = 0;
+        newDirection > 0
+            ? _motion->setMaxWall((std::min)(motionBound, _xrange.second))
+            : _motion->setMinWall((std::max)(motionBound, _xrange.first));
     }
 }
 
-void Gun::_doMoving(const double now)
+void Gun::eatTime(const double prevMoment, const double now)
 {
-    if( _movement == 0 )
-    {
-        _prevMoment = now;
+    if( !_motion )
         return;
-    }
     
-    // uniform component of motion
-    _positionX += (_movement * _speed) * (now - _prevMoment);
-
-    // accelerated component of motion
-    if( _speed < SPAAG_MAX_SPEED )
-    {
-        const double speedUpRestPerc = (SPAAG_MAX_SPEED - _speed) / SPAAG_MAX_SPEED;
-        const double speedUpMoment = _prevMoment + (SPAAG_SPEEDUP_TIME * speedUpRestPerc);
-        const double speedUpPeriod = (std::min)(speedUpMoment, now) - _prevMoment;
-
-        double speedAdd =
-            (SPAAG_MAX_SPEED / SPAAG_SPEEDUP_TIME) // acceleration
-            * speedUpPeriod;
-        _speed += speedAdd;
-
-        if( _movement < 0 )
-            speedAdd = -speedAdd;
-        _positionX += // a * t^2 / 2
-            speedAdd * speedUpPeriod / 2;
-    }
-
-    _prevMoment = now;
-
-    // bounds
-    pair<double, double> xrange = _xrange;
-    if( _movement < 0 )
-    {
-        if( xrange.first < _stopMoveX )
-            xrange.first = _stopMoveX;
-    }
-    else
-    {
-        if( xrange.second > _stopMoveX )
-            xrange.second = _stopMoveX;
-    }
-
-    if( _positionX < xrange.first )
-    {
-        _positionX = xrange.first;
-        _speed = 0;
-        _movement = 0;
-    }
-    else if( _positionX > xrange.second )
-    {
-        _positionX = xrange.second;
-        _speed = 0;
-        _movement = 0;
-    }
-}
-
-void Gun::updateStateByTime(const double moment)
-{
-    __super::updateStateByTime(moment);
-    _doMoving(moment);
+    // TODO: maybe include position into motion? MotionWalls1D has one
+    _positionX = _motion->pointAt(now);
 }

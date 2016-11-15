@@ -36,9 +36,6 @@
     <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Displayable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="timers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -55,6 +52,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Kinetic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,9 +74,6 @@
     <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Displayable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="timers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,6 +87,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Kinetic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

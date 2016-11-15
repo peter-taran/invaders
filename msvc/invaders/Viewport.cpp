@@ -14,8 +14,8 @@ Viewport::~Viewport()
 {}
 
 Viewport::Console::Console():
-    handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL,
-        CONSOLE_TEXTMODE_BUFFER, NULL))
+    handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+        CONSOLE_TEXTMODE_BUFFER, nullptr))
 {}
 
 Viewport::Console::~Console()
@@ -53,8 +53,7 @@ void Viewport::resize(const DisplayCoord& size)
     
     _console.resize(size);
     
-    _drawBuff.reset(new CHAR_INFO[_consoleCharCount]);
-    zeroBytes(&_drawBuff[0], &_drawBuff[_consoleCharCount]);
+    allocZeroedArray(_drawBuff, _consoleCharCount);
 }
 
 void Viewport::switchDisplay(Mode mode)

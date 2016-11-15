@@ -27,12 +27,22 @@ _______
 
 */
 
+Game* g_gameObject = nullptr;
+
+static void cleanGameObject(Game* game)
+{
+    g_gameObject = nullptr;
+    delete game;
+}
+
 int main()
 {
     try
     {
-        Game game;
-        game.run();
+        shared_ptr<Game> game(new Game(), &cleanGameObject);
+        g_gameObject = game.get();
+
+        g_gameObject->run();
 
         return 0;
     }

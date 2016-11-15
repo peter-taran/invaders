@@ -86,10 +86,10 @@
   <ItemGroup>
     <ClInclude Include="Basic.h" />
     <ClInclude Include="GameConstants.h" />
-    <ClInclude Include="Displayable.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Gun.h" />
+    <ClInclude Include="Kinetic.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StatusLine.h" />
     <ClInclude Include="stdafx.h" />
@@ -99,9 +99,10 @@
     <ClInclude Include="Viewport.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Displayable.cpp" />
+    <ClCompile Include="Basic.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Kinetic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Gun.cpp" />
     <ClCompile Include="Sprite.cpp" />

@@ -30,8 +30,7 @@ void Sprite::_initByStrList(const CharAttr& monoAttr, const wstring* strings,
     const int charCount = _size.x * _size.y;
     if( charCount > 0 )
     {
-        _chars.reset(new CHAR_INFO[charCount]);
-        zeroBytes(&_chars[0], &_chars[charCount]);
+        allocZeroedArray(_chars, charCount);
 
         // move characters
         CHAR_INFO* dest = _chars.get();

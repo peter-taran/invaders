@@ -140,7 +140,7 @@ void InputProcessor::collectCycle()
 void InputProcessor::processWaitingEvents()
 {
     InputEvents events;
-    events.reserve(32);
+    events.reserve(64);
 
     {
         boost::lock_guard<boost::mutex> singlethreaded(_queueAccess);
@@ -220,7 +220,7 @@ void InputProcessor::_syncMouseButtonStates(DWORD mouseButtonsState)
 
 bool InputProcessor::_syncFiredButtonState(const KEY_EVENT_RECORD& rec)
 {
-    ButtonState* btn = NULL;
+    ButtonState* btn = nullptr;
     switch(rec.wVirtualKeyCode)
     {
     case VK_LEFT:  btn = &_inputState.btnLeft; break;
@@ -320,7 +320,7 @@ void InputProcessor::_updateState_gunMove(const double moment, bool mouseMoveHap
 
     if( was != _state.gunMoveMode && _onChange_gunMove )
     {
-        _onChange_gunMove(Update<InputController::MoveMode>(moment, _state.gunMoveMode));
+        _onChange_gunMove(Command<InputController::MoveMode>(moment, _state.gunMoveMode));
     }
 }
 
@@ -335,6 +335,6 @@ void InputProcessor::_updateState_gunFire(const double moment)
 
     if( was != _state.gunFireMode && _onChange_gunFire )
     {
-        _onChange_gunFire(Update<InputController::FireMode>(moment, _state.gunFireMode));
+        _onChange_gunFire(Command<InputController::FireMode>(moment, _state.gunFireMode));
     }
 }

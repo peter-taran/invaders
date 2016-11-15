@@ -1,36 +1,32 @@
 #pragma once
 
-#include "Displayable.h"
 #include "Sprite.h"
 #include "Input.h"
 
 
-// self-propelled anti-aircraft gun
-class Gun: public Displayable
+// self-propelled anti-aircraft gun «Äþáåëü» ("Dubel")
+class Gun: public Drawable, public TimeEater
 {
 public:
     Gun(InputProcessor& input, const DisplayCoord& viewportSize);
     ~Gun();
 
     virtual void drawYourself(class Viewport& viewport); // override
-    virtual void updateStateByTime(const double moment); // override
+    virtual void eatTime(const double from, const double to); // override
+
+    // control actions
+    void commandFire(const Command<InputController::FireMode>& state);
+    void commandMove(const Command<InputController::MoveMode>& state);
 
 private:
-    // listeners
-    void _onChange_fire(const Update<InputController::FireMode>& state);
-    void _onChange_move(const Update<InputController::MoveMode>& state);
-
     // consts
     double _positionY;
     pair<double, double> _xrange;
 
     // current state
-    double _stopMoveX;
+    double _stopMotionAtX;
     double _positionX;
-    int _movement;
-    double _speed;
-    double _prevMoment;
-    void _doMoving(const double now);
+    scoped_ptr<class MotionWalls1D> _motion;
 
     // picture
     Sprite _image;

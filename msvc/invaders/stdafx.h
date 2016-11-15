@@ -34,6 +34,12 @@ using boost::scoped_ptr;
 #include <boost/scoped_array.hpp>
 using boost::scoped_array;
 
+#include <boost/shared_ptr.hpp>
+using boost::shared_ptr;
+
+#include <boost/weak_ptr.hpp>
+using boost::weak_ptr;
+
 #include <boost/static_assert.hpp>
 #define compile_assert BOOST_STATIC_ASSERT
 
@@ -58,11 +64,16 @@ using boost::array;
 #include <boost/format.hpp>
 using boost::wformat;
 
+#include <boost/type_traits/is_pod.hpp>
+
 #include <vector>
 using std::vector;
 
 #include <list>
 using std::list;
+
+#include <deque>
+using std::deque;
 
 #include <string>
 using std::wstring;
