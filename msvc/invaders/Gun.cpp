@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Gun.h"
 #include "Viewport.h"
-#include "Kinetic.h"
 #include "GameConstants.h"
 
 
@@ -85,36 +84,33 @@ void Gun::commandMove(const Command<InputController::MoveMode>& state)
         }
     }
 
-    if( (_motion ? _motion->direction(state.moment) : 0) != newDirection )
+    if( _motion.direction(state.moment) != newDirection )
     {
         if( 0 == newDirection)
         {
-            _motion.reset();
+            _motion = NoMotion(); // TODO: why it compiles?!
         }
         else
         {
-            _motion.reset(new MotionWalls1D(
-                new AcceleratedMotion1D(
+            _motion = MotionWalls1D(
+                AcceleratedMotion1D(
                     _positionX, state.moment,
                     (newDirection > 0 ? GUN_MAX_SPEED : -GUN_MAX_SPEED),
                     GUN_SPEEDUP_TIME
-            )));
-            _motion->setWalls(_xrange);
+            ));
+            _motion.setWalls(_xrange);
         }
     }
 
-    if( hasMotionBound && _motion )
+    if( hasMotionBound )
     {
         newDirection > 0
-            ? _motion->setMaxWall((std::min)(motionBound, _xrange.second))
-            : _motion->setMinWall((std::max)(motionBound, _xrange.first));
+            ? _motion.setMaxWall((std::min)(motionBound, _xrange.second))
+            : _motion.setMinWall((std::max)(motionBound, _xrange.first));
     }
 }
 
 void Gun::eatTime(const double prevMoment, const double now)
 {
-    if( !_motion )
-        return;
-    
-    _motion->updatePoint(_positionX, now);
+    _motion.updatePoint(_positionX, now);
 }

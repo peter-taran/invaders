@@ -2,6 +2,7 @@
 
 #include "Sprite.h"
 #include "Input.h"
+#include "Kinetic.h"
 
 
 // self-propelled anti-aircraft gun Ђƒюбельї ("Dubel")
@@ -26,7 +27,7 @@ private:
     // current state
     double _stopMotionAtX;
     double _positionX;
-    scoped_ptr<class MotionWalls1D> _motion;
+    MotionWalls1D _motion;
 
     // picture
     Sprite _image;
