@@ -12,7 +12,7 @@
 };*/
 static const array<wstring, 3> IMAGE = {
     L"    !!    ",
-    L"  ((°°))  ",
+    L"  ((ºº))  ",
     L"[==••••==]",
 };
 
@@ -116,6 +116,5 @@ void Gun::eatTime(const double prevMoment, const double now)
     if( !_motion )
         return;
     
-    // TODO: maybe include position into motion? MotionWalls1D has one
-    _positionX = _motion->pointAt(now);
+    _motion->updatePoint(_positionX, now);
 }

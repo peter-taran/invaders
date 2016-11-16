@@ -2,32 +2,33 @@
 
 
 // Interface for classes calculating 1-dimentional coordinate of time
-struct Motion1D
+class MotionController1D
 {
-    virtual ~Motion1D();
-    virtual double pointAt(const double moment) = 0;
+    // TODO: pimpl impementation here
+public:
+    virtual ~MotionController1D();
+    virtual void updatePoint(double& point, const double moment) = 0;
     virtual int direction(const double moment) const = 0; // -1, 0, +1
 };
 
-class MotionWalls1D: public Motion1D
+class MotionWalls1D: public MotionController1D
 {
-    scoped_ptr<Motion1D> _motion;
+    scoped_ptr<MotionController1D> _motion;
     double _wallMin;
     double _wallMax;
-    double _lastPos;
 
 public:
-    MotionWalls1D(Motion1D* motion); // takes owneship, create with operator new
+    MotionWalls1D(MotionController1D* motion); // takes owneship, create with operator new
 
     void setWalls(const std::pair<double, double>& walls);
     void setMinWall(const double minWall = -HUGE_VAL); // no arg - reset wall
     void setMaxWall(const double maxWall = HUGE_VAL); // no arg - reset wall
     
-    virtual double pointAt(const double moment); // override
+    virtual void updatePoint(double& point, const double moment); // override
     virtual int direction(const double moment) const; // override
 };
 
-class AcceleratedMotion1D: public Motion1D
+class AcceleratedMotion1D: public MotionController1D
 {
     const double _startPoint;
     const double _startMoment;
@@ -43,6 +44,6 @@ public:
         // speedUpTime cannot be 0 or negative
         // maxSpeed can be any, including 0 and negative
 
-    virtual double pointAt(const double moment); // override
+    virtual void updatePoint(double& point, const double moment); // override
     virtual int direction(const double moment) const; // override
 };

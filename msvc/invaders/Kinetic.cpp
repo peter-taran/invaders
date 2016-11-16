@@ -2,14 +2,26 @@
 #include "Kinetic.h"
 
 
-Motion1D::~Motion1D()
+MotionController1D::~MotionController1D()
 {}
 
-MotionWalls1D::MotionWalls1D(Motion1D* motion):
+// implement all motion interfaces, but goes nowhere
+class NoMotion: public MotionController1D
+{
+    virtual void updatePoint(double& point, const double moment)
+    {}
+
+    virtual int direction(const double moment) const
+    {
+        return 0;
+    }
+};
+static NoMotion g_noMotion;
+
+MotionWalls1D::MotionWalls1D(MotionController1D* motion):
     _motion(motion),
     _wallMin(-HUGE_VAL),
-    _wallMax(HUGE_VAL),
-    _lastPos()
+    _wallMax(HUGE_VAL)
 {}
 
 void MotionWalls1D::setWalls(const std::pair<double, double>& walls)
@@ -33,23 +45,23 @@ int MotionWalls1D::direction(const double moment) const
     return _motion ? _motion->direction(moment) : 0;
 }
 
-double MotionWalls1D::pointAt(const double moment)
+void  MotionWalls1D::updatePoint(double& point, const double moment)
 {
-    if( _motion )
-        _lastPos = _motion->pointAt(moment);
+    if( !_motion )
+        return;
     
-    if( _lastPos < _wallMin )
+    _motion->updatePoint(point, moment);
+    
+    if( point < _wallMin )
     {
         _motion.reset();
-        _lastPos = _wallMin;
+        point = _wallMin;
     }
-    else if( _lastPos > _wallMax )
+    else if( point > _wallMax )
     {
         _motion.reset();
-        _lastPos = _wallMax;
+        point = _wallMax;
     }
-    
-    return _lastPos;
 }
 
 AcceleratedMotion1D::AcceleratedMotion1D(const double startPoint,
@@ -74,19 +86,17 @@ int AcceleratedMotion1D::direction(const double) const
         return +1;
 }
 
-double AcceleratedMotion1D::pointAt(const double moment)
+void  AcceleratedMotion1D::updatePoint(double& point, const double moment)
 {
-    double result = _startPoint;
+    point = _startPoint;
 
     // accelerated motion, x = a * t^2 / 2
     const double t = (std::min)(moment, _maxSpeedMoment) - _startMoment;
-    result += _acceleration * t * t / 2;
+    point += _acceleration * t * t / 2;
 
     if( moment > _maxSpeedMoment )
     {
         // uniform motion after achieving max speed
-        result += (moment - _maxSpeedMoment) * _maxSpeed;
+        point += (moment - _maxSpeedMoment) * _maxSpeed;
     }
-
-    return result;
 }
