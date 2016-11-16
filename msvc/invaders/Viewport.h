@@ -7,7 +7,7 @@ public:
     Viewport();
     ~Viewport();
 
-    void resize(const DisplayCoord& size);
+    void resize(const DisplayCoords& size);
 
     enum Mode {
         Mode_game,
@@ -18,14 +18,14 @@ public:
     void eraseDrawFrame();
     void switchFrame();
 
-    void draw(const DisplayCoord& at, const class Sprite& sprite);
+    void draw(const DisplayCoords& at, const class Sprite& sprite);
 
     void fillAttr(const CharAttr& attr, const DisplayRect& rect);
 
-    void drawTextLine(const wstring& text, const DisplayCoord& startAt);
+    void drawTextLine(const wstring& text, const DisplayCoords& startAt);
 
 private:
-    DisplayCoord _consoleSize;
+    DisplayCoords _consoleSize;
     DWORD _consoleCharCount; // = _consoleSize.x * _consoleSize.y
 
     struct Console
@@ -35,7 +35,7 @@ private:
         Console();
         ~Console();
 
-        void resize(const DisplayCoord& sizes);
+        void resize(const DisplayCoords& sizes);
     };
     bool _showGame;
     Console _console;

@@ -8,9 +8,9 @@ NoMotion::Impl NoMotion::impl;
 Motion1D::Interface::~Interface()
 {}
 
-bool Motion1D::Interface::isNoMotion() const
+bool Motion1D::isNoMotion() const
 {
-    return &NoMotion::impl == this;
+    return &NoMotion::impl == _pimpl;
 }
 
 Motion1D::Motion1D(Interface* pimpl):
@@ -106,7 +106,7 @@ int MotionWalls1D::Impl::direction(const double moment) const
 
 void MotionWalls1D::Impl::updatePoint(double& point, const double moment)
 {
-    if( isNoMotion() ) // some optimization
+    if( _motion.isNoMotion() ) // some optimization
         return;
     
     _motion.updatePoint(point, moment);

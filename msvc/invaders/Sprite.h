@@ -11,7 +11,7 @@ public:
     Sprite(const array<wstring, SIZE>& strings, const CharAttr& monoAttr = CharAttr())
     { _initByStrList(monoAttr, strings.data(), strings.static_size); }
 
-    DisplayCoord size() const
+    DisplayCoords size() const
     { return _size; }
 
     int charCount() const
@@ -21,7 +21,7 @@ public:
     { return _chars ? *_chars.get() : NO_CHARS; }
 
 private:
-    DisplayCoord _size;
+    DisplayCoords _size;
     scoped_array<CHAR_INFO> _chars;
     static const CHAR_INFO NO_CHARS;
 

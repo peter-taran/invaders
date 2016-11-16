@@ -23,7 +23,7 @@ Viewport::Console::~Console()
     CloseHandle(handle);
 }
 
-void Viewport::Console::resize(const DisplayCoord& sizes)
+void Viewport::Console::resize(const DisplayCoords& sizes)
 {
     // TODO: check Windows results for errors, here and everywhere
 
@@ -46,7 +46,7 @@ void Viewport::Console::resize(const DisplayCoord& sizes)
     SetConsoleTitle(L"Морсеане отакуют!");
 }
 
-void Viewport::resize(const DisplayCoord& size)
+void Viewport::resize(const DisplayCoords& size)
 {
     _consoleSize = size;
     _consoleCharCount = _consoleSize.x * _consoleSize.y;
@@ -92,7 +92,7 @@ void Viewport::switchFrame()
     allRect.Bottom = _consoleSize.y - 1;
 
     WriteConsoleOutput(_console.handle, _drawBuff.get(), _consoleSize,
-        DisplayCoord(), &allRect);
+        DisplayCoords(), &allRect);
 }
 
 CHAR_INFO* Viewport::_drawCharPtr(const int x, const int y)
@@ -100,11 +100,11 @@ CHAR_INFO* Viewport::_drawCharPtr(const int x, const int y)
     return &_drawBuff[x + y *_consoleSize.x];
 }
 
-void Viewport::draw(const DisplayCoord& at, const Sprite& sprite)
+void Viewport::draw(const DisplayCoords& at, const Sprite& sprite)
 {
     // TODO: clipping
 
-    const DisplayCoord spriteSize = sprite.size();
+    const DisplayCoords spriteSize = sprite.size();
     
     const CHAR_INFO* spriteChar = &sprite.chars();
     for(int row = 0; row < spriteSize.y; ++row)
@@ -131,7 +131,7 @@ void Viewport::fillAttr(const CharAttr& attr, const DisplayRect& rect)
     }
 }
 
-void Viewport::drawTextLine(const wstring& text, const DisplayCoord& startAt)
+void Viewport::drawTextLine(const wstring& text, const DisplayCoords& startAt)
 {
     // TODO: clipping
 

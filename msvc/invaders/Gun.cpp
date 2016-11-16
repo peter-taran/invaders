@@ -15,7 +15,7 @@ static const array<wstring, 3> IMAGE = {
     L"[==••••==]",
 };
 
-Gun::Gun(InputProcessor& input, const DisplayCoord& viewportSize):
+Gun::Gun(InputProcessor& input, const DisplayCoords& viewportSize):
     TimeEater(willBeInitedLater),
 
     _positionY(),
@@ -47,7 +47,7 @@ Gun::~Gun()
 
 void Gun::drawYourself(Viewport& viewport)
 {
-    viewport.draw(DisplayCoord(_positionX - 4, _positionY),
+    viewport.draw(DisplayCoords(_positionX - 4, _positionY),
         _shooting ? _imageShooting : _image);
 }
 

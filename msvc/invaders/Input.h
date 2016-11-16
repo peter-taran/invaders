@@ -109,7 +109,7 @@ private:
     // State of input controls
     struct InputState
     {
-        DisplayCoord mousePos;
+        DisplayCoords mousePos;
     
         ButtonState btnMouse1; // VK_LBUTTON: leftmost button
         ButtonState btnMouse2; // VK_RBUTTON: rightmost button

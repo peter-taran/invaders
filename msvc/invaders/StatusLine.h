@@ -4,7 +4,7 @@
 class StatusLine: public Drawable
 {
 public:
-    StatusLine(const DisplayCoord& viewportSize);
+    StatusLine(const DisplayCoords& viewportSize);
     ~StatusLine();
 
     virtual void drawYourself(class Viewport& viewport); // override

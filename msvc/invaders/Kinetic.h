@@ -8,7 +8,6 @@ class Motion1D
 public: // for inheritors only; inheritors must not add members
     struct Interface
     {
-        bool isNoMotion() const; // for optimizations
         virtual ~Interface(); // for safe deletion
 
         // implement it
@@ -39,6 +38,8 @@ public:
     Motion1D& operator=(Motion1D&& from);
     Motion1D(const Motion1D& from);
     Motion1D& operator=(const Motion1D& from);
+
+    bool isNoMotion() const; // for optimizations: is it initialied with NoMotion()?
 
     // updates value of coordinate point for "current" moment
     // previous value of point commonly ignored, excepting no motion case

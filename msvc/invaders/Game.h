@@ -15,7 +15,7 @@ public:
     void run();
 
 private:
-    const DisplayCoord _viewportSize;
+    const DisplayCoords _viewportSize;
     Viewport _viewport;
     
     InputProcessor _input;

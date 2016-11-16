@@ -2,31 +2,6 @@
 #include "Game.h"
 
 
-/*
-_______
-\==o==/
-
-
-     *
-     *
-
-
-     |
-   ((*))
- <<=====>>
- 
- ooooooooo
-
-
-    O
-   ^*^
-  / | \
-    =
-   / \
-  /   \
-
-*/
-
 Game* g_gameObject = nullptr;
 
 static void cleanGameObject(Game* game)
@@ -39,8 +14,7 @@ int main()
 {
     try
     {
-        shared_ptr<Game> game(new Game(), &cleanGameObject);
-        g_gameObject = game.get();
+        shared_ptr<Game> game(g_gameObject = new Game(), &cleanGameObject);
 
         g_gameObject->run();
 

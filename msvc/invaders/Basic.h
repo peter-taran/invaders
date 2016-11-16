@@ -19,28 +19,28 @@ inline double dispToPhys(const int coord)
 }
 
 // Coordinates or sizes of something displayable
-struct DisplayCoord: equality_comparable<DisplayCoord>
+struct DisplayCoords: equality_comparable<DisplayCoords>
 {
     int x;
     int y;
 
-    DisplayCoord():
+    DisplayCoords():
         x(0), y(0)
     {}
 
-    DisplayCoord(int x, int y):
+    DisplayCoords(int x, int y):
         x(x), y(y)
     {}
 
-    DisplayCoord(double x, double y):
+    DisplayCoords(double x, double y):
         x(physToDisp(x)), y(physToDisp(y))
     {}
 
-    DisplayCoord(const COORD& from):
+    DisplayCoords(const COORD& from):
         x(from.X), y(from.Y)
     {}
 
-    bool operator==(const DisplayCoord& cmpWith) const
+    bool operator==(const DisplayCoords& cmpWith) const
     { return x == cmpWith.x && y == cmpWith.y; }
 
     COORD asCOORD() const
@@ -56,13 +56,13 @@ struct DisplayCoord: equality_comparable<DisplayCoord>
 // Rectangle in displayable coordinates
 struct DisplayRect
 {
-    DisplayCoord tl; // top-left point, included
-    DisplayCoord br; // bottom-right point, excluded
+    DisplayCoords tl; // top-left point, included
+    DisplayCoords br; // bottom-right point, excluded
 
     DisplayRect()
     {}
 
-    DisplayRect(const DisplayCoord& topLeft, int width, int height):
+    DisplayRect(const DisplayCoords& topLeft, int width, int height):
         tl(topLeft), br(topLeft.x + width, topLeft.y + height)
     {}
 
@@ -147,7 +147,7 @@ private:
 };
 
 // Interface to object should be painted
-class Drawable: noncopyable
+class Drawable
 {
 public:
     virtual void drawYourself(class Viewport& viewport) = 0;

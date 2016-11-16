@@ -9,7 +9,7 @@
 class Gun: public Drawable, public TimeEater
 {
 public:
-    Gun(InputProcessor& input, const DisplayCoord& viewportSize);
+    Gun(InputProcessor& input, const DisplayCoords& viewportSize);
     ~Gun();
 
     virtual void drawYourself(class Viewport& viewport); // override
