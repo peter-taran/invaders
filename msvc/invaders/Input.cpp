@@ -44,7 +44,17 @@ InputProcessor::InputProcessor():
     // last ones
     _working(0),
     _collectThread(bind(&InputProcessor::collectCycle, this))
-{}
+{
+    DWORD mode = 0;
+    GetConsoleMode(_console, &mode);
+
+    // disable edit with mouse by default
+    if( mode & ENABLE_EXTENDED_FLAGS )
+    {
+        mode &= ~ENABLE_QUICK_EDIT_MODE;
+        SetConsoleMode(_console, mode);
+    }
+}
 
 InputProcessor::~InputProcessor()
 {}

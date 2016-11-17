@@ -81,18 +81,20 @@ int NoMotion::Impl::direction(const double moment) const
 }
 
 MotionWalls1D::MotionWalls1D():
-    Motion1D(new Impl) // TODO: fix it
+    Motion1D(new Impl)
 {}
 
 MotionWalls1D::MotionWalls1D(Motion1D&& motion):
-    Motion1D(new Impl) // TODO: fix it with moved motion
-{}
+    Motion1D(new Impl)
+{
+    impl<Impl>()._motion = std::move(motion);
+}
 
 MotionWalls1D::MotionWalls1D(const Motion1D& motion):
-    // TODO: fix it
-    // Motion1D{new Impl{_motion, -HUGE_VAL, HUGE_VAL}}
     Motion1D(new Impl)
-{}
+{
+    impl<Impl>()._motion = motion;
+}
 
 MotionWalls1D::Interface* MotionWalls1D::Impl::clone()
 {
@@ -143,14 +145,18 @@ void MotionWalls1D::setMaxWall(const double maxWall)
 AcceleratedMotion1D::AcceleratedMotion1D(const double startPoint,
     const double startMoment, const double maxSpeed, const double speedUpTime)
 :
-    Motion1D(new Impl) // TODO: all parameters
-    /*_startPoint(startPoint),
-    _startMoment(startMoment),
-    _maxSpeed(maxSpeed),
-    _acceleration(maxSpeed / speedUpTime),
-    _maxSpeedMoment(startMoment + speedUpTime)*/
+    Motion1D(new Impl)
 {
     assert(speedUpTime > 0);
+
+    // I hate to declare same constructors with looong parameter lists
+    // both in AcceleratedMotion1D and it's Impl
+    Impl& i = impl<Impl>();
+    i._startPoint       = startPoint;
+    i._startMoment      = startMoment;
+    i._maxSpeed         = maxSpeed;
+    i._acceleration     = maxSpeed / speedUpTime;
+    i._maxSpeedMoment   = startMoment + speedUpTime;
 }
 
 AcceleratedMotion1D::Interface* AcceleratedMotion1D::Impl::clone()

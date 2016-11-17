@@ -39,7 +39,7 @@ Gun::Gun(InputProcessor& input, const DisplayCoords& viewportSize):
     _xrange.second = viewportSize.x - (gunWidth / 2) - 2;
     _positionX = (_xrange.first + _xrange.second) / 2;
 
-    _positionY = 40; // TODO: change to appropriate
+    _positionY = 40; // TODO change to appropriate
 }
 
 Gun::~Gun()
@@ -53,15 +53,15 @@ void Gun::drawYourself(Viewport& viewport)
 
 void Gun::commandFire(const Command<InputController::FireMode>& state)
 {
-    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
+    eatTimeUpTo(state.moment); // TODO how can we avoid manual call?
 
-    // TODO: real fire
+    // TODO real fire
     _shooting = state.now.opened;
 }
 
 void Gun::commandMove(const Command<InputController::MoveMode>& state)
 {
-    eatTimeUpTo(state.moment); // TODO: how can we avoid manual call?
+    eatTimeUpTo(state.moment); // TODO how can we avoid manual call?
 
     int newDirection = state.now.direction;
     bool hasMotionBound = false;
@@ -88,7 +88,7 @@ void Gun::commandMove(const Command<InputController::MoveMode>& state)
     {
         if( 0 == newDirection)
         {
-            _motion = NoMotion(); // TODO: why it compiles?!
+            _motion = NoMotion(); // TODO why it compiles?!
         }
         else
         {

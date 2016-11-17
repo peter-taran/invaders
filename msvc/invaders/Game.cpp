@@ -33,7 +33,7 @@ void Game::_init()
     _statusLine.reset(new StatusLine(_viewportSize));
 
     _gun.reset(new Gun(_input, _viewportSize));
-    _timeEaters.push_back(_gun); // TODO: how can we avoid manual doing of this?
+    _timeEaters.push_back(_gun); // TODO how can we avoid manual doing of this?
 
     // all shortcuts ending the game
     _input.listenShortcut(

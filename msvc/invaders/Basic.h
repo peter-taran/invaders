@@ -75,7 +75,10 @@ struct DisplayRect
 
     SMALL_RECT asRECT() const
     {
-        const SMALL_RECT result = {tl.x, tl.y, br.x-1, br.y-1};
+        const SMALL_RECT result = {
+            static_cast<short>(tl.x), static_cast<short>(tl.y),
+            static_cast<short>(br.x-1), static_cast<short>(br.y-1)
+        };
         return result;
     }
 
@@ -86,23 +89,23 @@ struct DisplayRect
 // starting from Vista you can declare your own colors for console (look
 // SetConsoleScreenBufferInfoEx), but here is standard ones
 enum DisplayColor {
-    DisplayColor_black   = 0x0,
-    DisplayColor_blue    = 0x1,
-    DisplayColor_green   = 0x2,
-    DisplayColor_aqua    = 0x3,
-    DisplayColor_red     = 0x4,
-    DisplayColor_purple  = 0x5,
-    DisplayColor_yellow  = 0x6,
-    DisplayColor_white   = 0x7,
+    DisplayColor_black          = 0x0,
+    DisplayColor_blue           = 0x1,
+    DisplayColor_green          = 0x2,
+    DisplayColor_aqua           = 0x3,
+    DisplayColor_red            = 0x4,
+    DisplayColor_purple         = 0x5,
+    DisplayColor_yellow         = 0x6,
+    DisplayColor_white          = 0x7,
 
-    DisplayColor_gray        = 0x8 | DisplayColor_black,
-    DisplayColor_lightBlue   = 0x8 | DisplayColor_blue,
-    DisplayColor_lightGreen  = 0x8 | DisplayColor_green,
-    DisplayColor_lightAqua   = 0x8 | DisplayColor_aqua,
-    DisplayColor_lightRed    = 0x8 | DisplayColor_red,
-    DisplayColor_lightPurple = 0x8 | DisplayColor_purple,
-    DisplayColor_lightYellow = 0x8 | DisplayColor_yellow,
-    DisplayColor_brightWhite = 0x8 | DisplayColor_white,
+    DisplayColor_gray           = 0x8 | DisplayColor_black,
+    DisplayColor_lightBlue      = 0x8 | DisplayColor_blue,
+    DisplayColor_lightGreen     = 0x8 | DisplayColor_green,
+    DisplayColorlightAqua       = 0x8 | DisplayColor_aqua,
+    DisplayColor_lightRed       = 0x8 | DisplayColor_red,
+    DisplayColor_lightPurple    = 0x8 | DisplayColor_purple,
+    DisplayColor_lightYellow    = 0x8 | DisplayColor_yellow,
+    DisplayColor_brightWhite    = 0x8 | DisplayColor_white,
 };
 
 class CharAttr

@@ -75,8 +75,8 @@ class MotionWalls1D: public Motion1D
     struct Impl: Motion1D::Interface
     {
         Motion1D _motion;
-        double _wallMin;
-        double _wallMax;
+        double _wallMin = -HUGE_VAL;
+        double _wallMax = +HUGE_VAL;
 
         virtual Interface* clone();
         virtual void updatePoint(double& point, const double moment);
@@ -94,19 +94,18 @@ public:
 
     void setWalls(const std::pair<double, double>& walls);
     void setMinWall(const double minWall = -HUGE_VAL); // no arg - reset wall
-    void setMaxWall(const double maxWall = HUGE_VAL); // no arg - reset wall
+    void setMaxWall(const double maxWall = +HUGE_VAL); // no arg - reset wall
 };
 
 class AcceleratedMotion1D: public Motion1D
 {
     struct Impl: Motion1D::Interface
     {
-        // TODO: add consts
-        double _startPoint;
-        double _startMoment;
-        double _maxSpeed;
-        double _acceleration;
-        double _maxSpeedMoment;
+        double _startPoint      {};
+        double _startMoment     {};
+        double _maxSpeed        {};
+        double _acceleration    {};
+        double _maxSpeedMoment  {};
         // initial speed maybe later
 
         virtual Interface* clone();

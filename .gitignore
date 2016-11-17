@@ -17,22 +17,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# msvc temporaries
-*.obj
-*.exe
-*.dll
-*.suo
-*.sdf
-*.opensdf
-*.log
-*.tlog
-*.ilk
-*.idb
-*.pdb
-*.pch
-*.ipch
-*.lastbuildstate
-
 # =========================
 # Operating System Files
 # =========================
@@ -61,3 +45,24 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# =========================
+# msvc temporaries
+# =========================
+*.obj
+*.exe
+*.dll
+*.suo
+*.sdf
+*.opensdf
+*.log
+*.tlog
+*.ilk
+*.idb
+*.pdb
+*.ipdb
+*.pch
+*.ipch
+*.lastbuildstate
+*.db
+*.iobj

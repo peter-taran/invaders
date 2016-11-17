@@ -25,7 +25,7 @@ Viewport::Console::~Console()
 
 void Viewport::Console::resize(const DisplayCoords& sizes)
 {
-    // TODO: check Windows results for errors, here and everywhere
+    // TODO check Windows results for errors, here and everywhere
 
     SetConsoleScreenBufferSize(handle, sizes);
 
@@ -102,7 +102,7 @@ CHAR_INFO* Viewport::_drawCharPtr(const int x, const int y)
 
 void Viewport::draw(const DisplayCoords& at, const Sprite& sprite)
 {
-    // TODO: clipping
+    // TODO clipping
 
     const DisplayCoords spriteSize = sprite.size();
     
@@ -121,7 +121,7 @@ void Viewport::draw(const DisplayCoords& at, const Sprite& sprite)
 
 void Viewport::fillAttr(const CharAttr& attr, const DisplayRect& rect)
 {
-    // TODO: clipping
+    // TODO clipping
 
     for(int y = rect.tl.y; y < rect.br.y; ++y)
     {
@@ -133,7 +133,7 @@ void Viewport::fillAttr(const CharAttr& attr, const DisplayRect& rect)
 
 void Viewport::drawTextLine(const wstring& text, const DisplayCoords& startAt)
 {
-    // TODO: clipping
+    // TODO clipping
 
     CHAR_INFO* putChar = _drawCharPtr(startAt.x, startAt.y);
     foreach(wchar_t ch, text)

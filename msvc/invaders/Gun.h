@@ -32,7 +32,7 @@ private:
     // picture
     Sprite _image;
 
-    // TODO: temp, to debug
+    // TODO temp, to debug
     bool _shooting;
     Sprite _imageShooting;
 };
