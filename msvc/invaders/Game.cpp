@@ -29,10 +29,9 @@ void Game::_init()
 {
     _objs.reset(new GameStaticObjects);
 
-    //_viewportSize = GameStaticObjects::minViewportSize();
-    //_viewportSize.x = (std::max)(_viewportSize.x, GetSystemMetrics(SM_CXMIN));
-    //_viewportSize.y = (std::max)(_viewportSize.y, GetSystemMetrics(SM_CYMIN));
-    _viewportSize = {140, 50};
+    _viewportSize = GameStaticObjects::minViewportSize();
+    _viewportSize.x = (std::max)(_viewportSize.x, GetSystemMetrics(SM_CXMIN));
+    _viewportSize.y = (std::max)(_viewportSize.y, GetSystemMetrics(SM_CYMIN));
 
     _objs->init(_viewportSize, _input);
 
