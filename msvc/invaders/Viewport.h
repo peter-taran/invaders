@@ -7,13 +7,8 @@ public:
     Viewport();
     ~Viewport();
 
-    void resize(const DisplayCoords& size);
-
-    enum Mode {
-        Mode_game,
-        Mode_stdout,
-    };
-    void switchDisplay(Mode mode);
+    void gameMode(const DisplayCoords& size);
+    void stdMode(); // на консоли stdin/stdout
     
     void eraseDrawFrame();
     void switchFrame();
@@ -32,13 +27,12 @@ private:
     {
         HANDLE handle;
 
-        Console();
+        Console(const DisplayCoords& size);
         ~Console();
 
         void resize(const DisplayCoords& sizes);
     };
-    bool _showGame;
-    Console _console;
+    scoped_ptr<Console> _console;
 
     scoped_array<CHAR_INFO> _drawBuff;
     CHAR_INFO* _drawCharPtr(const int x, const int y);

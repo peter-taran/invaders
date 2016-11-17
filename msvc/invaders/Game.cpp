@@ -29,13 +29,12 @@ void Game::_init()
 {
     _objs.reset(new GameStaticObjects);
 
-    DisplayCoords viewportSize = GameStaticObjects::minViewportSize();
-    viewportSize.x = (std::max)(viewportSize.x, GetSystemMetrics(SM_CXMIN));
-    viewportSize.y = (std::max)(viewportSize.y, GetSystemMetrics(SM_CYMIN));
-    
-    _viewport.resize(viewportSize);
+    //_viewportSize = GameStaticObjects::minViewportSize();
+    //_viewportSize.x = (std::max)(_viewportSize.x, GetSystemMetrics(SM_CXMIN));
+    //_viewportSize.y = (std::max)(_viewportSize.y, GetSystemMetrics(SM_CYMIN));
+    _viewportSize = {140, 50};
 
-    _objs->init(viewportSize, _input);
+    _objs->init(_viewportSize, _input);
 
     _timeEaters.push_back(_objs->gun); // TODO how can we avoid manual doing of this?
 
@@ -58,7 +57,7 @@ void Game::run()
 
     _init();
 
-    _viewport.switchDisplay(Viewport::Mode_game);
+    _viewport.gameMode(_viewportSize);
 
     timers::TimerEx timer;
     _input.start();
@@ -89,7 +88,7 @@ void Game::run()
     }
 
     _input.nowEnough();
-    _viewport.switchDisplay(Viewport::Mode_stdout);
+    _viewport.stdMode();
     cout << "Game ended" << endl;
 }
 

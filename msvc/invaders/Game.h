@@ -35,6 +35,7 @@ public:
 
 private:
     Viewport _viewport;
+    DisplayCoords _viewportSize;
     
     InputProcessor _input;
 

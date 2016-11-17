@@ -6,34 +6,26 @@
 
 Viewport::Viewport():
     _consoleSize(),
-    _consoleCharCount(0),
-    _showGame(false)
+    _consoleCharCount(0)
 {}
 
 Viewport::~Viewport()
 {}
 
-Viewport::Console::Console():
+Viewport::Console::Console(const DisplayCoords& size):
     handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr,
         CONSOLE_TEXTMODE_BUFFER, nullptr))
-{}
-
-Viewport::Console::~Console()
-{
-    CloseHandle(handle);
-}
-
-void Viewport::Console::resize(const DisplayCoords& sizes)
 {
     // TODO check Windows results for errors, here and everywhere
 
-    SetConsoleScreenBufferSize(handle, sizes);
+    SetConsoleActiveScreenBuffer(handle);
 
     SMALL_RECT rect;
     zeroVar(rect);
-    rect.Right = sizes.x - 1;
-    rect.Bottom = sizes.y - 1;
+    rect.Right = size.x - 1;
+    rect.Bottom = size.y - 1;
     SetConsoleWindowInfo(handle, TRUE, &rect);
+    SetConsoleScreenBufferSize(handle, size);
 
     SetConsoleOutputCP(CP_UTF8);
 
@@ -46,30 +38,27 @@ void Viewport::Console::resize(const DisplayCoords& sizes)
     SetConsoleTitle(L"Морсеане отакуют!");
 }
 
-void Viewport::resize(const DisplayCoords& size)
+Viewport::Console::~Console()
 {
-    _consoleSize = size;
-    _consoleCharCount = _consoleSize.x * _consoleSize.y;
-    
-    _console.resize(size);
-    
-    allocZeroedArray(_drawBuff, _consoleCharCount);
+    SetConsoleActiveScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
+    CloseHandle(handle);
 }
 
-void Viewport::switchDisplay(Mode mode)
+void Viewport::gameMode(const DisplayCoords& size)
 {
-    switch(mode)
-    {
-    case Mode_game:
-        _showGame = true;
-        SetConsoleActiveScreenBuffer(_console.handle);
-        break;
-    case Mode_stdout:
-        _showGame = false;
-        SetConsoleActiveScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
-        break;
-    default: unreachable("B8FE5A8D-FFE9-4D59-B4B9-FA6C4EF43F7F");
-    }
+    if( _console )
+        return;
+
+    _consoleSize = size;
+    _consoleCharCount = _consoleSize.x * _consoleSize.y;
+    allocZeroedArray(_drawBuff, _consoleCharCount);
+
+    _console.reset(new Console(size));
+}
+
+void Viewport::stdMode()
+{
+    _console.reset();
 }
 
 void Viewport::eraseDrawFrame()
@@ -91,7 +80,7 @@ void Viewport::switchFrame()
     allRect.Right = _consoleSize.x - 1;
     allRect.Bottom = _consoleSize.y - 1;
 
-    WriteConsoleOutput(_console.handle, _drawBuff.get(), _consoleSize,
+    WriteConsoleOutput(_console->handle, _drawBuff.get(), _consoleSize,
         DisplayCoords(), &allRect);
 }
 
