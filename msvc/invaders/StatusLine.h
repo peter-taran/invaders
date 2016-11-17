@@ -4,8 +4,10 @@
 class StatusLine: public Drawable
 {
 public:
-    StatusLine(const DisplayCoords& viewportSize);
+    StatusLine(const DisplayRect& area);
     ~StatusLine();
+
+    static int height(); // how many lines on display it takes
 
     virtual void drawYourself(class Viewport& viewport); // override
 

@@ -4,13 +4,20 @@
 #include "Viewport.h"
 
 
-StatusLine::StatusLine(const DisplayCoords& viewportSize):
-    _charCount(viewportSize.x),
-    _bottomIndex(viewportSize.y - 3)
-{}
+StatusLine::StatusLine(const DisplayRect& area):
+    _charCount(area.width()),
+    _bottomIndex(area.tl.y)
+{
+    assert(area.height() == height());
+}
 
 StatusLine::~StatusLine()
 {}
+
+int StatusLine::height()
+{
+    return 3;
+}
 
 void StatusLine::drawYourself(Viewport& viewport)
 {

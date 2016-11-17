@@ -52,8 +52,8 @@ void Human::drawYourself(class Viewport& viewport)
     viewport.draw(_pos, SPRITE_HUMAN);
 }
 
-SweetHome::SweetHome(int posY):
-    _posY(posY)
+SweetHome::SweetHome(const DisplayRect& area):
+    _posY(area.tl.y)
 {
     _humans.reserve(HUMAN_NUMBER);
 
@@ -68,7 +68,7 @@ SweetHome::SweetHome(int posY):
 SweetHome::~SweetHome()
 {}
 
-DisplayCoords SweetHome::areaSize()
+DisplayCoords SweetHome::minSize()
 {
     const DisplayCoords hs = SPRITE_HUMAN.size();
     return DisplayCoords(

@@ -4,7 +4,26 @@
 #include "Input.h"
 #include "Gun.h"
 #include "StatusLine.h"
+#include "SweetHome.h"
 
+
+// Responsible for static (always existing) game objects and their layout
+struct GameStaticObjects: noncopyable
+{
+    GameStaticObjects(); // do not create objects
+    ~GameStaticObjects();
+
+    // what minimal viewport size can accomodate all the objects
+    static DisplayCoords minViewportSize();
+
+    // creates all objects
+    void init(const DisplayCoords& viewportSize, InputProcessor& input);
+
+    // objects
+    shared_ptr<Gun> gun;
+    shared_ptr<StatusLine> statusLine;
+    shared_ptr<SweetHome> sweetHome;
+};
 
 class Game: noncopyable
 {
@@ -15,7 +34,6 @@ public:
     void run();
 
 private:
-    const DisplayCoords _viewportSize;
     Viewport _viewport;
     
     InputProcessor _input;
@@ -26,8 +44,7 @@ private:
     TimeEaters _timeEaters;
 
     // static game objects
-    shared_ptr<Gun> _gun;
-    shared_ptr<StatusLine> _statusLine;
+    scoped_ptr<GameStaticObjects> _objs;
 
     void _init();
     void _initStaticTimeEaters();

@@ -21,10 +21,10 @@ private:
 class SweetHome: public Drawable
 {
 public:
-    SweetHome(int posY);
+    SweetHome(const DisplayRect& area);
     ~SweetHome();
 
-    static DisplayCoords areaSize(); // how much place we need
+    static DisplayCoords minSize(); // how much place we need
 
     void drawYourself(class Viewport& viewport);
 

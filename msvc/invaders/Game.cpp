@@ -5,15 +5,12 @@
 
 
 Game::Game():
-    _viewportSize(GAME_FIELD_SIZE),
     _input(),
     _frameCounter(),
     _timeEaters(),
 
     _exitGameSignal(false)
-{
-    _viewport.resize(_viewportSize);
-}
+{}
 
 Game::~Game()
 {}
@@ -30,10 +27,17 @@ void Game::_initStaticTimeEaters()
 
 void Game::_init()
 {
-    _statusLine.reset(new StatusLine(_viewportSize));
+    _objs.reset(new GameStaticObjects);
 
-    _gun.reset(new Gun(_input, _viewportSize));
-    _timeEaters.push_back(_gun); // TODO how can we avoid manual doing of this?
+    DisplayCoords viewportSize = GameStaticObjects::minViewportSize();
+    viewportSize.x = (std::max)(viewportSize.x, GetSystemMetrics(SM_CXMIN));
+    viewportSize.y = (std::max)(viewportSize.y, GetSystemMetrics(SM_CYMIN));
+    
+    _viewport.resize(viewportSize);
+
+    _objs->init(viewportSize, _input);
+
+    _timeEaters.push_back(_objs->gun); // TODO how can we avoid manual doing of this?
 
     // all shortcuts ending the game
     _input.listenShortcut(
@@ -109,8 +113,9 @@ void Game::_buildFrame()
 {
     _viewport.eraseDrawFrame();
 
-    _statusLine->drawYourself(_viewport);
-    _gun->drawYourself(_viewport);
+    _objs->statusLine->drawYourself(_viewport);
+    _objs->sweetHome->drawYourself(_viewport);
+    _objs->gun->drawYourself(_viewport);
 
     _viewport.switchFrame();
 }
@@ -121,4 +126,47 @@ void Game::_cleanup()
         return;
 
     ::cleanup(_timeEaters);
+}
+
+GameStaticObjects::GameStaticObjects()
+{}
+
+GameStaticObjects::~GameStaticObjects()
+{}
+
+static const int SKY_HEIGHT = 20;
+
+DisplayCoords GameStaticObjects::minViewportSize()
+{
+    DisplayCoords size = SweetHome::minSize();
+    size.y += Gun::height();
+    size.y += StatusLine::height();
+    size.y += SKY_HEIGHT;
+    size.y += 2; // spaces
+
+    return size;
+}
+
+void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input)
+{
+    int y = 0;
+    int height = 0;
+    
+    y += SKY_HEIGHT; // skip sky yet
+
+    height = Gun::height();
+    gun.reset(new Gun(input, {{0, y}, viewportSize.x, height}));
+    y += height;
+
+    ++y; // space between
+
+    height = SweetHome::minSize().y;
+    sweetHome.reset(new SweetHome({{0, y}, viewportSize.x, height}));
+    y += height;
+
+    ++y; // space between
+
+    height = StatusLine::height();
+    statusLine.reset(new StatusLine({{0, y}, viewportSize.x, height}));
+    y += height;
 }

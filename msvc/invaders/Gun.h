@@ -9,8 +9,10 @@
 class Gun: public Drawable, public TimeEater
 {
 public:
-    Gun(InputProcessor& input, const DisplayCoords& viewportSize);
+    Gun(InputProcessor& input, const DisplayRect& area);
     ~Gun();
+
+    static int height(); // gun's height on display
 
     virtual void drawYourself(class Viewport& viewport); // override
     virtual void eatTime(const double from, const double to); // override

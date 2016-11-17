@@ -15,10 +15,10 @@ static const array<wstring, 3> IMAGE = {
     L"[==••••==]",
 };
 
-Gun::Gun(InputProcessor& input, const DisplayCoords& viewportSize):
+Gun::Gun(InputProcessor& input, const DisplayRect& area):
     TimeEater(willBeInitedLater),
 
-    _positionY(),
+    _positionY(area.tl.y),
     _xrange(),
 
     _stopMotionAtX(-1),
@@ -33,17 +33,21 @@ Gun::Gun(InputProcessor& input, const DisplayCoords& viewportSize):
     input.listenGunMoveModeChange(bind(&Gun::commandMove, this, _1));
     input.listenGunFireModeChange(bind(&Gun::commandFire, this, _1));
 
-    const double gunWidth = _image.size().x;
+    const double gunHalfWidth = _image.size().x / 2;
 
-    _xrange.first = (gunWidth / 2);
-    _xrange.second = viewportSize.x - (gunWidth / 2) - 2;
+    _xrange = std::make_pair(area.tl.x, area.br.x);
+    _xrange.first   += gunHalfWidth;
+    _xrange.second  -= gunHalfWidth + 2;
     _positionX = (_xrange.first + _xrange.second) / 2;
-
-    _positionY = 40; // TODO change to appropriate
 }
 
 Gun::~Gun()
 {}
+
+int Gun::height()
+{
+    return IMAGE.static_size;
+}
 
 void Gun::drawYourself(Viewport& viewport)
 {
@@ -88,7 +92,7 @@ void Gun::commandMove(const Command<InputController::MoveMode>& state)
     {
         if( 0 == newDirection)
         {
-            _motion = NoMotion(); // TODO why it compiles?!
+            _motion = NoMotion();
         }
         else
         {
