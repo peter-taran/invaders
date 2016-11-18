@@ -28,3 +28,25 @@ void TimeEater::eatTimeUpTo(const double moment)
     eatTime(_eatenUpTo, moment);
     _eatenUpTo = moment;
 }
+
+DisplayAreaVertLayout::DisplayAreaVertLayout(const DisplayRect& totalArea):
+    _rect(totalArea)
+{}
+
+void DisplayAreaVertLayout::gap(int gapY)
+{
+    _rect.br.y -= gapY;
+}
+
+DisplayRect DisplayAreaVertLayout::nextField(int height)
+{
+    DisplayRect ret = _rect;
+    ret.tl.y = ret.br.y - height;
+    _rect.br.y = ret.tl.y;
+    return ret;
+}
+
+DisplayRect DisplayAreaVertLayout::restArea()
+{
+    return _rect;
+}

@@ -35,7 +35,7 @@ Gun::Gun(InputProcessor& input, const DisplayRect& area):
 
     const double gunHalfWidth = _image.size().x / 2;
 
-    _xrange = std::make_pair(area.tl.x, area.br.x);
+    _xrange = make_pair(area.tl.x, area.br.x);
     _xrange.first   += gunHalfWidth;
     _xrange.second  -= gunHalfWidth + 2;
     _positionX = (_xrange.first + _xrange.second) / 2;

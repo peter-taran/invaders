@@ -129,6 +129,20 @@ private:
     WORD _attrib;
 };
 
+// layouts display rectangles starting bottom to top
+class DisplayAreaVertLayout
+{
+    DisplayRect _rect;
+
+public:
+    DisplayAreaVertLayout(const DisplayRect& totalArea);
+
+    void gap(int gapY);
+
+    DisplayRect nextField(int height);
+    DisplayRect restArea(); // all the area still unallocated
+};
+
 // Some object, processing going of time
 class TimeEater
 {

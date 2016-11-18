@@ -3,6 +3,8 @@
 
 timers::Now g_now;
 
+boost::random::mt19937 g_random;
+
 struct UnreachableException: public std::exception
 {
     UnreachableException(const char* codePlaceID):

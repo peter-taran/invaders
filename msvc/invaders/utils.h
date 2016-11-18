@@ -9,6 +9,9 @@ void doNothing(Type*)
 // timer to get current moment anywhere
 extern timers::Now g_now;
 
+// random generator
+extern boost::random::mt19937 g_random;
+
 // mark point should never reached
 void __declspec(noreturn) unreachable(const char* codePlaceID);
 
@@ -57,6 +60,19 @@ void cleanup(deque< weak_ptr<Type> >& elems)
     foreach(const weak_ptr<Type>& elem, elems)
     {
         if( !elem.expired() ) // in multithreading some garbage can stay, it's OK
+            copied.push_back(std::move(elem));
+    }
+    elems.swap(copied);
+}
+
+// cleanup garbage of container - null pointers
+template<class Type>
+void cleanup(deque< shared_ptr<Type> >& elems)
+{
+    deque< shared_ptr<Type> > copied;
+    foreach(const shared_ptr<Type>& elem, elems)
+    {
+        if( elem )
             copied.push_back(std::move(elem));
     }
     elems.swap(copied);

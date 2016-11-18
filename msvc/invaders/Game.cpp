@@ -1,15 +1,11 @@
 #include "stdafx.h"
 #include "Game.h"
 #include "Sprite.h"
+#include "InvaderShips.h"
 #include "GameConstants.h"
 
 
-Game::Game():
-    _input(),
-    _frameCounter(),
-    _timeEaters(),
-
-    _exitGameSignal(false)
+Game::Game()
 {}
 
 Game::~Game()
@@ -33,9 +29,7 @@ void Game::_init()
     _viewportSize.x = (std::max)(_viewportSize.x, GetSystemMetrics(SM_CXMIN));
     _viewportSize.y = (std::max)(_viewportSize.y, GetSystemMetrics(SM_CYMIN));
 
-    _objs->init(_viewportSize, _input);
-
-    _timeEaters.push_back(_objs->gun); // TODO how can we avoid manual doing of this?
+    _objs->init(_viewportSize, _input, _timeEaters);
 
     // all shortcuts ending the game
     _input.listenShortcut(
@@ -100,8 +94,11 @@ void Game::_updateStateByTime()
 {
     const double now = g_now.sec();
 
-    foreach(const weak_ptr<TimeEater>& item, _timeEaters)
+    // _timeEaters can grow during enumeration, so we can't use iterators and
+    // must not save size()
+    for(std::size_t i = 0; i < _timeEaters.size(); ++i)
     {
+        auto item = _timeEaters[i];
         if( shared_ptr<TimeEater> itemLocked = item.lock() )
             itemLocked->eatTimeUpTo(now);
     }
@@ -112,6 +109,9 @@ void Game::_buildFrame()
     _viewport.eraseDrawFrame();
 
     _objs->sweetHome->drawYourself(_viewport);
+
+    _objs->shipManager->drawYourself(_viewport);
+
     _objs->gun->drawYourself(_viewport);
 
     // status line better to be last
@@ -126,6 +126,7 @@ void Game::_cleanup()
         return;
 
     ::cleanup(_timeEaters);
+    _objs->shipManager->cleanup();
 }
 
 GameStaticObjects::GameStaticObjects()
@@ -134,52 +135,83 @@ GameStaticObjects::GameStaticObjects()
 GameStaticObjects::~GameStaticObjects()
 {}
 
-class GameFieldLayout
-{
-    DisplayRect _rect;
-
-public:
-    GameFieldLayout(const DisplayCoords& viewportSize):
-        _rect{DisplayCoords(0, viewportSize.y), viewportSize.x, 0}
-    {}
-
-    void gap(int gapY)
-    {
-        _rect.br.y -= gapY;
-    }
-
-    DisplayRect nextField(int height)
-    {
-        DisplayRect ret = _rect;
-        ret.tl.y = ret.br.y - height;
-        _rect.br.y = ret.tl.y;
-        return ret;
-    }
-};
-
-static const int SKY_HEIGHT = 25;
-
 DisplayCoords GameStaticObjects::minViewportSize()
 {
     DisplayCoords size = SweetHome::minSize();
     size.y += Gun::height();
     size.y += StatusLine::height();
-    size.y += SKY_HEIGHT;
+    size.y += Sky::height();
     size.y += 1; // gaps
 
     return size;
 }
 
-void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input)
+void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input,
+    TimeEaters& timeEaters)
 {
     // размещаем объекты снизу вверх
-    GameFieldLayout gfl{viewportSize};
+    DisplayAreaVertLayout layout{{DisplayCoords(0, viewportSize.y), viewportSize.x, 0}};
 
-    statusLine.reset(new StatusLine{gfl.nextField(StatusLine::height())});
+    statusLine.reset(new StatusLine{layout.nextField(StatusLine::height())});
 
-    sweetHome.reset(new SweetHome{gfl.nextField(SweetHome::minSize().y)});
+    sweetHome.reset(new SweetHome{layout.nextField(SweetHome::minSize().y)});
 
-    gfl.gap(1);
+    layout.gap(1);
 
-    gun.reset(new Gun{input, gfl.nextField(Gun::height())});
+    gun.reset(new Gun{input, layout.nextField(Gun::height())});
+    timeEaters.push_back(gun);
+
+    sky.reset(new Sky{layout.restArea()});
+
+    shipManager.reset(new ShipManager{sky, timeEaters});
+    timeEaters.push_back(shipManager);
+}
+
+ShipManager::ShipManager(const shared_ptr<Sky>& sky, TimeEaters& timeEaters):
+    TimeEater{willBeInitedLater},
+    _sky{sky},
+    _timeEaters{timeEaters},
+    _left{0.5}
+{}
+
+ShipManager::~ShipManager()
+{}
+
+void ShipManager::eatTime(const double from, const double to)
+{
+    _left -= (to - from);
+
+    // remove all the ships flew away
+    foreach(ShipPtr& ship, _ships)
+    {
+        if( ship && ship->flewAway() )
+            ship.reset();
+    }
+
+    // may be new ships?
+    if( _left < 0 )
+    {
+        _left = SHIP_BASIC_FREQUENCY;
+
+        const auto echelon = _sky->randomLowEchelon();
+
+        _ships.push_back(ShipPtr(
+            new RegularBomber{to, echelon.first, echelon.second ? -1 : +1}
+        ));
+        _timeEaters.push_back(_ships.back());
+    }
+}
+
+void ShipManager::drawYourself(Viewport& viewport)
+{
+    foreach(const ShipPtr& ship, _ships)
+    {
+        if( ship )
+            ship->drawYourself(viewport);
+    }
+}
+
+void ShipManager::cleanup()
+{
+    ::cleanup(_ships);
 }

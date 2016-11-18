@@ -21,6 +21,7 @@ using std::ends;
 
 #include <algorithm>
 using std::pair;
+using std::make_pair;
 
 #include <boost/noncopyable.hpp>
 using boost::noncopyable;
@@ -65,6 +66,12 @@ using boost::array;
 using boost::wformat;
 
 #include <boost/type_traits/is_pod.hpp>
+
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/discrete_distribution.hpp>
+using boost::random::uniform_int_distribution;
+using boost::random::discrete_distribution;
 
 #include <vector>
 using std::vector;

@@ -4,31 +4,6 @@
 #include "GameConstants.h"
 
 
-/*
-_______
-\==o==/
-
-
-     *
-     *
-
-
-     |
-   ((*))
- <<=====>>
- 
- ooooooooo
-
-
-    O
-   ^*^
-  / | \
-    =
-   / \
-  /   \
-
-*/
-
 static array<wstring, 6> IMG_HUMAN = {
     L"  O",
     L" ^*^",

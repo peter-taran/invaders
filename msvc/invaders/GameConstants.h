@@ -2,7 +2,7 @@
 
 
 // fixed FPS
-static const double FPS = 30; // frame/sec
+static const double FPS = 33; // frame/sec
 static const double FRAME_TIME = 1.0 / FPS; // sec
 
 // how ofter we need to clean
@@ -21,3 +21,15 @@ static const DisplayColor STATUS_LINE_TEXT = DisplayColor_brightWhite;
 static const int HUMAN_NUMBER = 10;
 static const int HUMAN_DIST_BETWEEN = 8;
 static const int HUMAN_SPACE_LEFTRIGHT = 20;
+
+// Echelongs for invider's ships
+static const int ECHELONG_NEVER_USED_SPACE      = 6;
+static const int ECHELONG_KAMIKAZE_AREA_HEIGHT  = 8;
+static const int ECHELONG_LOW_COUNT             = 4;
+static const int ECHELONG_LOW_HEIGHT            = 3;
+static const int ECHELONG_HIGH_COUNT            = 2;
+static const int ECHELONG_HIGH_HEIGHT           = 5;
+
+// Invader ships
+static const double SHIP_BASIC_FREQUENCY = 1; // one ship per SHIP_BASIC_FREQUENCY
+static const double SHIP_REGUALAR_SPEED = GUN_MAX_SPEED / 6;

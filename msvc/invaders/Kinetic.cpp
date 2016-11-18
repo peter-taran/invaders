@@ -87,13 +87,13 @@ MotionWalls1D::MotionWalls1D():
 MotionWalls1D::MotionWalls1D(Motion1D&& motion):
     Motion1D(new Impl)
 {
-    impl<Impl>()._motion = std::move(motion);
+    impl<Impl>().motion = std::move(motion);
 }
 
 MotionWalls1D::MotionWalls1D(const Motion1D& motion):
     Motion1D(new Impl)
 {
-    impl<Impl>()._motion = motion;
+    impl<Impl>().motion = motion;
 }
 
 MotionWalls1D::Interface* MotionWalls1D::Impl::clone()
@@ -103,43 +103,43 @@ MotionWalls1D::Interface* MotionWalls1D::Impl::clone()
 
 int MotionWalls1D::Impl::direction(const double moment) const
 {
-    return _motion.direction(moment);
+    return motion.direction(moment);
 }
 
 void MotionWalls1D::Impl::updatePoint(double& point, const double moment)
 {
-    if( _motion.isNoMotion() ) // some optimization
+    if( motion.isNoMotion() ) // some optimization
         return;
     
-    _motion.updatePoint(point, moment);
+    motion.updatePoint(point, moment);
     
-    if( point < _wallMin )
+    if( point < wallMin )
     {
-        _motion = NoMotion();
-        point = _wallMin;
+        motion = NoMotion();
+        point = wallMin;
     }
-    else if( point > _wallMax )
+    else if( point > wallMax )
     {
-        _motion = NoMotion();
-        point = _wallMax;
+        motion = NoMotion();
+        point = wallMax;
     }
 }
 
 void MotionWalls1D::setWalls(const std::pair<double, double>& walls)
 {
     Impl& data = impl<Impl>();
-    data._wallMin = walls.first;
-    data._wallMax = walls.second;
+    data.wallMin = walls.first;
+    data.wallMax = walls.second;
 }
 
 void MotionWalls1D::setMinWall(const double minWall)
 {
-    impl<Impl>()._wallMin = minWall;
+    impl<Impl>().wallMin = minWall;
 }
 
 void MotionWalls1D::setMaxWall(const double maxWall)
 {
-    impl<Impl>()._wallMax = maxWall;
+    impl<Impl>().wallMax = maxWall;
 }
 
 AcceleratedMotion1D::AcceleratedMotion1D(const double startPoint,
@@ -152,11 +152,11 @@ AcceleratedMotion1D::AcceleratedMotion1D(const double startPoint,
     // I hate to declare same constructors with looong parameter lists
     // both in AcceleratedMotion1D and it's Impl
     Impl& i = impl<Impl>();
-    i._startPoint       = startPoint;
-    i._startMoment      = startMoment;
-    i._maxSpeed         = maxSpeed;
-    i._acceleration     = maxSpeed / speedUpTime;
-    i._maxSpeedMoment   = startMoment + speedUpTime;
+    i.startPoint       = startPoint;
+    i.startMoment      = startMoment;
+    i.maxSpeed         = maxSpeed;
+    i.acceleration     = maxSpeed / speedUpTime;
+    i.maxSpeedMoment   = startMoment + speedUpTime;
 }
 
 AcceleratedMotion1D::Interface* AcceleratedMotion1D::Impl::clone()
@@ -166,9 +166,9 @@ AcceleratedMotion1D::Interface* AcceleratedMotion1D::Impl::clone()
 
 int AcceleratedMotion1D::Impl::direction(const double) const
 {
-    if( _maxSpeed == 0 )
+    if( maxSpeed == 0 )
         return 0;
-    else if( _maxSpeed < 0 )
+    else if( maxSpeed < 0 )
         return -1;
     else
         return +1;
@@ -176,15 +176,45 @@ int AcceleratedMotion1D::Impl::direction(const double) const
 
 void  AcceleratedMotion1D::Impl::updatePoint(double& point, const double moment)
 {
-    point = _startPoint;
+    point = startPoint;
 
     // accelerated motion, x = a * t^2 / 2
-    const double t = (std::min)(moment, _maxSpeedMoment) - _startMoment;
-    point += _acceleration * t * t / 2;
+    const double t = (std::min)(moment, maxSpeedMoment) - startMoment;
+    point += acceleration * t * t / 2;
 
-    if( moment > _maxSpeedMoment )
+    if( moment > maxSpeedMoment )
     {
         // uniform motion after achieving max speed
-        point += (moment - _maxSpeedMoment) * _maxSpeed;
+        point += (moment - maxSpeedMoment) * maxSpeed;
     }
+}
+
+UniformMotion1D::UniformMotion1D(const double startPoint, const double startMoment,
+    const double speed)
+:
+    Motion1D(new Impl)
+{
+    Impl& i = impl<Impl>();
+
+    i.startPoint = startPoint;
+    i.startMoment = startMoment;
+    i.speed = speed;
+}
+
+UniformMotion1D::Interface* UniformMotion1D::Impl::clone()
+{
+    return new Impl{*this};
+}
+
+void UniformMotion1D::Impl::updatePoint(double& point, const double moment)
+{
+    point = startPoint + (moment - startMoment) * speed;
+}
+
+int UniformMotion1D::Impl::direction(const double moment) const
+{
+    return
+        speed == 0 ?  0 :
+        speed  < 0 ? -1 :
+                     +1 ;
 }

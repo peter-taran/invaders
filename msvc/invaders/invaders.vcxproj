@@ -89,23 +89,27 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Gun.h" />
+    <ClInclude Include="InvaderShips.h" />
     <ClInclude Include="Kinetic.h" />
+    <ClInclude Include="Sky.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="StatusLine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SweetHome.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="timers.h" />
-    <ClInclude Include="utils.h" />
+    <ClInclude Include="Timers.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Viewport.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Basic.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="InvaderShips.cpp" />
     <ClCompile Include="Kinetic.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="Gun.cpp" />
+    <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="StatusLine.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -113,8 +117,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SweetHome.cpp" />
-    <ClCompile Include="timers.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="Timers.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Viewport.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
