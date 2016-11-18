@@ -111,9 +111,11 @@ void Game::_buildFrame()
 {
     _viewport.eraseDrawFrame();
 
-    _objs->statusLine->drawYourself(_viewport);
     _objs->sweetHome->drawYourself(_viewport);
     _objs->gun->drawYourself(_viewport);
+
+    // status line better to be last
+    _objs->statusLine->drawYourself(_viewport);
 
     _viewport.switchFrame();
 }
@@ -132,7 +134,30 @@ GameStaticObjects::GameStaticObjects()
 GameStaticObjects::~GameStaticObjects()
 {}
 
-static const int SKY_HEIGHT = 20;
+class GameFieldLayout
+{
+    DisplayRect _rect;
+
+public:
+    GameFieldLayout(const DisplayCoords& viewportSize):
+        _rect{DisplayCoords(0, viewportSize.y), viewportSize.x, 0}
+    {}
+
+    void gap(int gapY)
+    {
+        _rect.br.y -= gapY;
+    }
+
+    DisplayRect nextField(int height)
+    {
+        DisplayRect ret = _rect;
+        ret.tl.y = ret.br.y - height;
+        _rect.br.y = ret.tl.y;
+        return ret;
+    }
+};
+
+static const int SKY_HEIGHT = 25;
 
 DisplayCoords GameStaticObjects::minViewportSize()
 {
@@ -140,31 +165,21 @@ DisplayCoords GameStaticObjects::minViewportSize()
     size.y += Gun::height();
     size.y += StatusLine::height();
     size.y += SKY_HEIGHT;
-    size.y += 2; // spaces
+    size.y += 1; // gaps
 
     return size;
 }
 
 void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input)
 {
-    int y = 0;
-    int height = 0;
-    
-    y += SKY_HEIGHT; // skip sky yet
+    // размещаем объекты снизу вверх
+    GameFieldLayout gfl{viewportSize};
 
-    height = Gun::height();
-    gun.reset(new Gun(input, {{0, y}, viewportSize.x, height}));
-    y += height;
+    statusLine.reset(new StatusLine{gfl.nextField(StatusLine::height())});
 
-    ++y; // space between
+    sweetHome.reset(new SweetHome{gfl.nextField(SweetHome::minSize().y)});
 
-    height = SweetHome::minSize().y;
-    sweetHome.reset(new SweetHome({{0, y}, viewportSize.x, height}));
-    y += height;
+    gfl.gap(1);
 
-    ++y; // space between
-
-    height = StatusLine::height();
-    statusLine.reset(new StatusLine({{0, y}, viewportSize.x, height}));
-    y += height;
+    gun.reset(new Gun{input, gfl.nextField(Gun::height())});
 }

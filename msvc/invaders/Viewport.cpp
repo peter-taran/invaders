@@ -20,27 +20,25 @@ Viewport::Console::Console(const DisplayCoords& size):
 
     SetConsoleOutputCP(CP_UTF8);
 
-    //CONSOLE_SCREEN_BUFFER_INFO csbi;
-    //GetConsoleScreenBufferInfo(handle, &csbi);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(handle, &csbi);
 
-    // window must alway be inside buffer bounds
-    // leading to problem of call order
-    //SMALL_RECT rect;
-    //zeroVar(rect);
-    //rect.Right = size.x - 1;
-    //rect.Bottom = size.y - 1;
-    //SetConsoleScreenBufferSize(handle, size); // it's first
-    //SetConsoleWindowInfo(handle, TRUE, &rect); // it's second
+    SMALL_RECT rect;
+    zeroVar(rect);
+    rect.Right = size.x - 1;
+    rect.Bottom = size.y - 1;
+    SetConsoleScreenBufferSize(handle, size); // it's first
+    SetConsoleWindowInfo(handle, TRUE, &rect); // it's second
 
-    CONSOLE_SCREEN_BUFFER_INFOEX csbi;
-    zeroVar(csbi);
-    csbi.cbSize = sizeof(csbi);
-    GetConsoleScreenBufferInfoEx(handle, &csbi);
-    csbi.dwMaximumWindowSize = csbi.dwSize = size;
-    csbi.srWindow.Right = size.x - 1;
-    csbi.srWindow.Bottom = size.y - 1;
-    SetConsoleScreenBufferInfoEx(handle, &csbi);
-    GetConsoleScreenBufferInfoEx(handle, &csbi);
+    //CONSOLE_SCREEN_BUFFER_INFOEX csbi;
+    //zeroVar(csbi);
+    //csbi.cbSize = sizeof(csbi);
+    //GetConsoleScreenBufferInfoEx(handle, &csbi);
+    //csbi.dwMaximumWindowSize = csbi.dwSize = size;
+    //csbi.srWindow.Right = size.x - 1;
+    //csbi.srWindow.Bottom = size.y - 1;
+    //SetConsoleScreenBufferInfoEx(handle, &csbi);
+    //GetConsoleScreenBufferInfoEx(handle, &csbi);
     
     CONSOLE_CURSOR_INFO cci;
     zeroVar(cci);
