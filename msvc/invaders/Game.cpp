@@ -23,6 +23,8 @@ void Game::_initStaticTimeEaters()
 
 void Game::_init()
 {
+    g_random.seed(static_cast<uint32_t>(std::time(0)));
+
     _objs.reset(new GameStaticObjects);
 
     _viewportSize = GameStaticObjects::minViewportSize();
@@ -149,7 +151,6 @@ DisplayCoords GameStaticObjects::minViewportSize()
 void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input,
     TimeEaters& timeEaters)
 {
-    // размещаем объекты снизу вверх
     DisplayAreaVertLayout layout{{DisplayCoords(0, viewportSize.y), viewportSize.x, 0}};
 
     statusLine.reset(new StatusLine{layout.nextField(StatusLine::height())});
