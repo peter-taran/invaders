@@ -29,8 +29,8 @@ Viewport::Console::Console(const DisplayCoords& size):
     //zeroVar(rect);
     //rect.Right = size.x - 1;
     //rect.Bottom = size.y - 1;
-    //SetConsoleWindowInfo(handle, TRUE, &rect);
-    //SetConsoleScreenBufferSize(handle, size);
+    //SetConsoleScreenBufferSize(handle, size); // it's first
+    //SetConsoleWindowInfo(handle, TRUE, &rect); // it's second
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
     zeroVar(csbi);
@@ -41,7 +41,7 @@ Viewport::Console::Console(const DisplayCoords& size):
     csbi.srWindow.Bottom = size.y - 1;
     SetConsoleScreenBufferInfoEx(handle, &csbi);
     GetConsoleScreenBufferInfoEx(handle, &csbi);
-
+    
     CONSOLE_CURSOR_INFO cci;
     zeroVar(cci);
     cci.bVisible = FALSE;
