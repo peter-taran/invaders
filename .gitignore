@@ -67,3 +67,4 @@ Temporary Items
 *.db
 *.iobj
 *.opendb
+*.enc
