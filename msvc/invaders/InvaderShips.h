@@ -5,7 +5,7 @@
 #include "Kinetic.h"
 
 
-class InvaderShip: public TransientDrawable, public TimeEater
+class InvaderShip: public TransientDrawable, public TimeEater, noncopyable
 {
 public:
     InvaderShip(const double moment);
@@ -15,7 +15,8 @@ public:
 class RegularBomber: public InvaderShip
 {
 public:
-    RegularBomber(const double moment, Echelon& echelon, int direction);
+    RegularBomber(struct GameControllers& controllers, const double moment,
+        Echelon& echelon, int direction);
         // -1: left-to-right; +1: right-to-left
     ~RegularBomber();
 
@@ -25,9 +26,15 @@ public:
 
 private:
     Echelon& _echelon;
+    struct GameControllers& _controllers;
     Sprite _image;
     pair<double, double> _xrange;
-    double _posX;
+    double _posX = 0;
+    double _posY = 0;
     Motion1D _motion;
+    double _dropPoint = 0;
+    bool _bombDropped = false;
+
+    bool _timeToBombSaddam(const double moment);
 };
 

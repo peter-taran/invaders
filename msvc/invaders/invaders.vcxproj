@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Basic.h" />
+    <ClInclude Include="Damagers.h" />
     <ClInclude Include="GameConstants.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Input.h" />
@@ -103,6 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Basic.cpp" />
+    <ClCompile Include="Damagers.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="InvaderShips.cpp" />

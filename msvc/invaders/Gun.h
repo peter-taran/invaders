@@ -6,7 +6,7 @@
 
 
 // self-propelled anti-aircraft gun «Äşáåëü» ("Dubel")
-class Gun: public Drawable, public TimeEater
+class Gun: public Drawable, public TimeEater, noncopyable
 {
 public:
     Gun(const DisplayRect& area);

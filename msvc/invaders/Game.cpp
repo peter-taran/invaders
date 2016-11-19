@@ -212,7 +212,7 @@ void Screenplay::play(const double moment)
         const auto echelon = _sky->randomLowEchelon();
 
         shared_ptr<RegularBomber> ship {
-            new RegularBomber{moment, echelon.first, echelon.second ? -1 : +1}
+            new RegularBomber{_controllers, moment, echelon.first, echelon.second ? -1 : +1}
         };
 
         _controllers.timeEaters.put(ship);
@@ -283,8 +283,11 @@ void TimeEaters::initAll(const double moment)
 
 void TimeEaters::eatTime(const double now)
 {
-    foreach(const auto& eater, _eaters)
+    // _eaters can grow up during this cycle, so no iterators and
+    // calculate size() every iteration
+    for(size_t i = 0; i < _eaters.size(); ++i)
     {
+        const auto& eater = _eaters[i];
         if( shared_ptr<TimeEater> eaterLocked = eater.lock() )
             eaterLocked->eatTimeUpTo(now);
     }
