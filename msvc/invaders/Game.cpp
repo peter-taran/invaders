@@ -98,7 +98,7 @@ void Game::_updateStateByTime()
 
     // _timeEaters can grow during enumeration, so we can't use iterators and
     // must not save size()
-    for(std::size_t i = 0; i < _timeEaters.size(); ++i)
+    for(size_t i = 0; i < _timeEaters.size(); ++i)
     {
         auto item = _timeEaters[i];
         if( shared_ptr<TimeEater> itemLocked = item.lock() )

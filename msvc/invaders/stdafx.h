@@ -64,6 +64,7 @@ using boost::array;
 
 #include <boost/format.hpp>
 using boost::wformat;
+using boost::format;
 
 #include <boost/type_traits/is_pod.hpp>
 
@@ -85,6 +86,8 @@ using std::deque;
 #include <string>
 using std::wstring;
 using std::string;
+
+using std::size_t;
 
 #include "timers.h"
 #include "utils.h"

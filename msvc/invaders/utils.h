@@ -15,6 +15,9 @@ extern boost::random::mt19937 g_random;
 // mark point should never reached
 void __declspec(noreturn) unreachable(const char* codePlaceID);
 
+// throw exception abount GetLastError()
+void __declspec(noreturn) throwGetLastError(const char* atWhat);
+
 // Declaration to say, that object should stay uninitialized (will be initialized later)
 static const struct WillBeInitedLater {} willBeInitedLater;
 

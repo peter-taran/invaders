@@ -23,6 +23,9 @@ private:
     DisplayCoords _consoleSize;
     DWORD _consoleCharCount; // = _consoleSize.x * _consoleSize.y
 
+    void _makeConsoleWindowPrivate();
+    void _checkConsoleHaveNoWin10Features();
+
     struct Console
     {
         HANDLE handle;

@@ -62,9 +62,8 @@ public:
     void run();
 
 private:
-    Viewport _viewport;
+    Viewport _viewport; // must be first, to initialize console window properly
     DisplayCoords _viewportSize;
-    
     InputProcessor _input;
 
     long long _frameCounter;

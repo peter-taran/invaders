@@ -7,38 +7,77 @@
 Viewport::Viewport():
     _consoleSize(),
     _consoleCharCount(0)
-{}
+{
+    _makeConsoleWindowPrivate();
+
+    _checkConsoleHaveNoWin10Features();
+}
 
 Viewport::~Viewport()
 {}
 
-Viewport::Console::Console(const DisplayCoords& size):
-    handle(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr,
-        CONSOLE_TEXTMODE_BUFFER, nullptr))
+void Viewport::_makeConsoleWindowPrivate()
 {
-    // TODO check Windows results for errors, here and everywhere
+    array<DWORD, 2> pids = {};
+    switch( GetConsoleProcessList(pids.data(), pids.size()) )
+    {
+    case 1: // we're only attached process
+        break;
+    default: // many processes, leaving them with their console
+        FreeConsole();
+        // no break here
+    case 0: // we have no console window
+        if( !AllocConsole() )
+            throwGetLastError("allocating console");
+        break;
+    }
+}
 
-    SetConsoleOutputCP(CP_UTF8);
+void Viewport::_checkConsoleHaveNoWin10Features()
+{
+    // Console features introduced in Windows 10 (also known as "version 2")
+    // strongly interferes us
+    // TODO implement this
+}
+
+Viewport::Console::Console(const DisplayCoords& size):
+    handle{INVALID_HANDLE_VALUE}
+{
+    // TODO check Windows results everywhere
+
+    handle = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, nullptr,
+        CONSOLE_TEXTMODE_BUFFER, nullptr);
+    if( INVALID_HANDLE_VALUE == handle )
+        throwGetLastError("creating console character buffer");
+        
+    if( !SetConsoleOutputCP(CP_UTF8) )
+        throwGetLastError("setting UTF-8 encoding to console");
 
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    GetConsoleScreenBufferInfo(handle, &csbi);
+    if( !GetConsoleScreenBufferInfo(handle, &csbi) )
+        throwGetLastError("retrieving console parameters");
 
     SMALL_RECT rect;
     zeroVar(rect);
     rect.Right = size.x - 1;
     rect.Bottom = size.y - 1;
-    SetConsoleScreenBufferSize(handle, size); // it's first
-    SetConsoleWindowInfo(handle, TRUE, &rect); // it's second
+    if( !SetConsoleScreenBufferSize(handle, size) ) // it's first
+        throwGetLastError("resizing console");
+    if( !SetConsoleWindowInfo(handle, TRUE, &rect) ) // it's second
+        throwGetLastError("resizing console window");
 
     //CONSOLE_SCREEN_BUFFER_INFOEX csbi;
     //zeroVar(csbi);
     //csbi.cbSize = sizeof(csbi);
-    //GetConsoleScreenBufferInfoEx(handle, &csbi);
+    //if( !GetConsoleScreenBufferInfoEx(handle, &csbi) )
+    // ...
     //csbi.dwMaximumWindowSize = csbi.dwSize = size;
     //csbi.srWindow.Right = size.x - 1;
     //csbi.srWindow.Bottom = size.y - 1;
-    //SetConsoleScreenBufferInfoEx(handle, &csbi);
-    //GetConsoleScreenBufferInfoEx(handle, &csbi);
+    //if( !SetConsoleScreenBufferInfoEx(handle, &csbi) )
+    // ...
+    //if( !GetConsoleScreenBufferInfoEx(handle, &csbi) )
+    // ...
     
     CONSOLE_CURSOR_INFO cci;
     zeroVar(cci);
@@ -46,14 +85,20 @@ Viewport::Console::Console(const DisplayCoords& size):
     cci.dwSize = 1;
     SetConsoleCursorInfo(handle, &cci);
 
-    SetConsoleActiveScreenBuffer(handle);
-    SetConsoleTitle(L"Морсеане отакуют!");
+    if( !SetConsoleActiveScreenBuffer(handle) )
+        throwGetLastError("switching screen buffer");
+
+    if( !SetConsoleTitle(L"Морсеане отакуют!") )
+        throwGetLastError("changing console window title");
 }
 
 Viewport::Console::~Console()
 {
-    SetConsoleActiveScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
-    CloseHandle(handle);
+    if( INVALID_HANDLE_VALUE != handle )
+    {
+        SetConsoleActiveScreenBuffer(GetStdHandle(STD_OUTPUT_HANDLE));
+        CloseHandle(handle);
+    }
 }
 
 void Viewport::gameMode(const DisplayCoords& size)
