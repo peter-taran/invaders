@@ -5,13 +5,11 @@
 #include "Kinetic.h"
 
 
-class InvaderShip: public Drawable, public TimeEater
+class InvaderShip: public TransientDrawable, public TimeEater
 {
 public:
     InvaderShip(const double moment);
     ~InvaderShip();
-
-    virtual bool flewAway() = 0;
 };
 
 class RegularBomber: public InvaderShip
@@ -23,7 +21,7 @@ public:
 
     virtual void drawYourself(class Viewport& viewport);
     virtual void eatTime(const double from, const double to);
-    virtual bool flewAway();
+    virtual bool timeToDie();
 
 private:
     Echelon& _echelon;

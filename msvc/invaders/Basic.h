@@ -143,7 +143,14 @@ public:
     DisplayRect restArea(); // all the area still unallocated
 };
 
-// Some object, processing going of time
+// Objects with cleaning procedures
+class Cleanee
+{
+public:
+    virtual void cleanUp() = 0;
+};
+
+// Object watching for going of time
 class TimeEater
 {
 protected:
@@ -168,4 +175,11 @@ class Drawable
 {
 public:
     virtual void drawYourself(class Viewport& viewport) = 0;
+};
+
+// Object who know conditions when it's time to leave
+class TransientDrawable: public Drawable
+{
+public:
+    virtual bool timeToDie() = 0;
 };

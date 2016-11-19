@@ -11,27 +11,70 @@ Game::Game()
 Game::~Game()
 {}
 
-void Game::_initStaticTimeEaters()
+void Game::run()
 {
-    const double now = g_now.sec();
-    foreach(const weak_ptr<TimeEater>& item, _timeEaters)
+    cout << "Game started" << endl;
+
+    timers::TimerEx timer;
+    double frameMoment = g_now.sec();
+
+    _init(frameMoment);
+
+    _viewport.gameMode(_viewportSize);
+
+    _input.start();
+    while(!_exitGameSignal)
     {
-        if( shared_ptr<TimeEater> itemLocked = item.lock() )
-            itemLocked->laterInit(now);
+        // Frame started
+        timer.reset();
+        frameMoment = g_now.sec();
+
+        // changes the game state with new input events
+        _input.processWaitingEvents();
+
+        // updates state up to current moment
+        _controllers->timeEaters.eatTime(frameMoment);
+
+        // generate screenplay events
+        _controllers->screenplay.play(frameMoment);
+
+        // kill out of game objects
+        _controllers->transients.killThoseWhoseTimeHasCome();
+
+        // collisions processing
+        // TODO
+
+        // cleaning garbage sometimes
+        _controllers->cleaner.cleanUp();
+
+        // builds and displays new frame
+        _buildFrame();
+
+        // sleep up to the end of current frame
+        // negative sleep time is OK, no sleeping
+        timers::SleepPrecSec(FRAME_TIME - timer.passedSec());
+
+        // Frame ended
+        ++_controllers->frameCounter;
     }
+
+    _input.nowEnough();
+    _viewport.stdMode();
+
+    cout << "Game ended" << endl;
 }
 
-void Game::_init()
+void Game::_init(const double moment)
 {
     g_random.seed(static_cast<uint32_t>(std::time(0)));
 
-    _objs.reset(new GameStaticObjects);
+    _controllers.reset(new GameControllers);
 
     _viewportSize = GameStaticObjects::minViewportSize();
     _viewportSize.x = (std::max)(_viewportSize.x, GetSystemMetrics(SM_CXMIN));
     _viewportSize.y = (std::max)(_viewportSize.y, GetSystemMetrics(SM_CYMIN));
 
-    _objs->init(_viewportSize, _input, _timeEaters);
+    _objs.reset(new GameStaticObjects(_viewportSize, _input, *_controllers));
 
     // all shortcuts ending the game
     _input.listenShortcut(
@@ -42,49 +85,12 @@ void Game::_init()
         Shortcut('Q', Shortcut_withAlt, bind(&Game::_onExitGame, this)));
     _input.listenShortcut(
         Shortcut('Q', Shortcut_withCtrl, bind(&Game::_onExitGame, this)));
-    
-    _initStaticTimeEaters();
-}
 
-void Game::run()
-{
-    cout << "Game started" << endl;
+    // initing static time eaters
+    _controllers->timeEaters.initAll(moment);
 
-    _init();
-
-    _viewport.gameMode(_viewportSize);
-
-    timers::TimerEx timer;
-    _input.start();
-    _frameCounter = 0;
-    while(!_exitGameSignal)
-    {
-        // Frame started
-        timer.reset();
-
-        // changes the game state with new input events
-        _input.processWaitingEvents();
-
-        // update state up to current moment
-        _updateStateByTime();
-
-        // builds and displays new frame
-        _buildFrame();
-
-        // cleaning up
-        _cleanup();
-
-        // sleep up to the end of current frame
-        // negative sleep time is OK, no sleeping
-        timers::SleepPrecSec(FRAME_TIME - timer.passedSec());
-
-        // Frame ended
-        ++_frameCounter;
-    }
-
-    _input.nowEnough();
-    _viewport.stdMode();
-    cout << "Game ended" << endl;
+    // starting screenplay
+    _controllers->screenplay.start(_objs->sky, moment);
 }
 
 void Game::_onExitGame()
@@ -92,47 +98,15 @@ void Game::_onExitGame()
     _exitGameSignal = true;
 }
 
-void Game::_updateStateByTime()
-{
-    const double now = g_now.sec();
-
-    // _timeEaters can grow during enumeration, so we can't use iterators and
-    // must not save size()
-    for(size_t i = 0; i < _timeEaters.size(); ++i)
-    {
-        auto item = _timeEaters[i];
-        if( shared_ptr<TimeEater> itemLocked = item.lock() )
-            itemLocked->eatTimeUpTo(now);
-    }
-}
-
 void Game::_buildFrame()
 {
     _viewport.eraseDrawFrame();
 
-    _objs->sweetHome->drawYourself(_viewport);
-
-    _objs->shipManager->drawYourself(_viewport);
-
-    _objs->gun->drawYourself(_viewport);
-
-    // status line better to be last
-    _objs->statusLine->drawYourself(_viewport);
+    _controllers->transients.drawYourself(_viewport);
+    _objs->drawYourself(_viewport);
 
     _viewport.switchFrame();
 }
-
-void Game::_cleanup()
-{
-    if( (_frameCounter % CLEAN_UP_EVERY_NTH_FRAME) != 0 )
-        return;
-
-    ::cleanup(_timeEaters);
-    _objs->shipManager->cleanup();
-}
-
-GameStaticObjects::GameStaticObjects()
-{}
 
 GameStaticObjects::~GameStaticObjects()
 {}
@@ -148,8 +122,8 @@ DisplayCoords GameStaticObjects::minViewportSize()
     return size;
 }
 
-void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& input,
-    TimeEaters& timeEaters)
+GameStaticObjects::GameStaticObjects(const DisplayCoords& viewportSize,
+    InputProcessor& input, GameControllers& controllers)
 {
     DisplayAreaVertLayout layout{{DisplayCoords(0, viewportSize.y), viewportSize.x, 0}};
 
@@ -159,60 +133,164 @@ void GameStaticObjects::init(const DisplayCoords& viewportSize, InputProcessor& 
 
     layout.gap(1);
 
-    gun.reset(new Gun{input, layout.nextField(Gun::height())});
-    timeEaters.push_back(gun);
+    gun.reset(new Gun{layout.nextField(Gun::height())});
+    controllers.timeEaters.put(gun);
+    input.listenGunMoveModeChange(bind(&Gun::commandMove, gun.get(), _1));
+    input.listenGunFireModeChange(bind(&Gun::commandFire, gun.get(), _1));
 
     sky.reset(new Sky{layout.restArea()});
-
-    shipManager.reset(new ShipManager{sky, timeEaters});
-    timeEaters.push_back(shipManager);
 }
 
-ShipManager::ShipManager(const shared_ptr<Sky>& sky, TimeEaters& timeEaters):
-    TimeEater{willBeInitedLater},
-    _sky{sky},
-    _timeEaters{timeEaters},
-    _left{0.5}
-{}
-
-ShipManager::~ShipManager()
-{}
-
-void ShipManager::eatTime(const double from, const double to)
+void GameStaticObjects::drawYourself(class Viewport& viewport)
 {
-    _left -= (to - from);
+    sweetHome->drawYourself(viewport);
 
-    // remove all the ships flew away
-    foreach(ShipPtr& ship, _ships)
+    gun->drawYourself(viewport);
+
+    // status line better to be last
+    statusLine->drawYourself(viewport);
+}
+
+TransientsManager::TransientsManager()
+{}
+
+TransientsManager::~TransientsManager()
+{}
+
+void TransientsManager::put(const shared_ptr<TransientDrawable>& object)
+{
+    _objects.push_back(object);
+}
+
+void TransientsManager::killThoseWhoseTimeHasCome()
+{
+    foreach(auto& object, _objects)
     {
-        if( ship && ship->flewAway() )
-            ship.reset();
+        if( object && object->timeToDie() )
+        {
+            object.reset();
+        }
     }
+}
 
-    // may be new ships?
-    if( _left < 0 )
+void TransientsManager::drawYourself(Viewport& viewport)
+{
+    foreach(const auto& object, _objects)
     {
-        _left = SHIP_BASIC_FREQUENCY;
+        if( object )
+        {
+            object->drawYourself(viewport);
+        }
+    }
+}
+
+void TransientsManager::cleanUp()
+{
+    ::cleanup(_objects);
+}
+
+Screenplay::Screenplay(GameControllers& controllers):
+    _controllers{controllers}
+{}
+
+Screenplay::~Screenplay()
+{}
+
+void Screenplay::start(const shared_ptr<Sky>& sky, const double moment)
+{
+    _sky = sky;
+    _lastShipBirth = moment - 1;
+}
+
+void Screenplay::play(const double moment)
+{
+    // may be new ships?
+    if( (moment - _lastShipBirth) >= SHIP_BASIC_FREQUENCY )
+    {
+        _lastShipBirth = moment;
 
         const auto echelon = _sky->randomLowEchelon();
 
-        _ships.push_back(ShipPtr(
-            new RegularBomber{to, echelon.first, echelon.second ? -1 : +1}
-        ));
-        _timeEaters.push_back(_ships.back());
+        shared_ptr<RegularBomber> ship {
+            new RegularBomber{moment, echelon.first, echelon.second ? -1 : +1}
+        };
+
+        _controllers.timeEaters.put(ship);
+        _controllers.transients.put(ship);
     }
 }
 
-void ShipManager::drawYourself(Viewport& viewport)
+Cleaner::Cleaner(GameControllers& controllers):
+    _controllers(controllers)
+{}
+
+Cleaner::~Cleaner()
+{}
+
+void Cleaner::put(const shared_ptr<Cleanee>& object)
 {
-    foreach(const ShipPtr& ship, _ships)
+    _objects.push_back(object);
+}
+
+void Cleaner::cleanUp()
+{
+    if( (_controllers.frameCounter % CLEAN_UP_EVERY_NTH_FRAME) != 0 )
+        return;
+
+    // cleaning static objects
+    _controllers.timeEaters.cleanUp();
+    _controllers.transients.cleanUp();
+
+    // cleaning dynamic objects
+    foreach(auto& object, _objects)
     {
-        if( ship )
-            ship->drawYourself(viewport);
+        if( shared_ptr<Cleanee> objectLocked = object.lock() )
+        {
+            objectLocked->cleanUp();
+        }
+    }
+
+    ::cleanup(_objects);
+}
+
+GameControllers::GameControllers():
+    cleaner(*this),
+    screenplay(*this)
+{}
+
+GameControllers::~GameControllers()
+{}
+
+TimeEaters::TimeEaters()
+{}
+
+TimeEaters::~TimeEaters()
+{}
+
+void TimeEaters::put(const shared_ptr<TimeEater>& object)
+{
+    _eaters.push_back(object);
+}
+
+void TimeEaters::initAll(const double moment)
+{
+    foreach(const auto& item, _eaters)
+    {
+        if( shared_ptr<TimeEater> itemLocked = item.lock() )
+            itemLocked->laterInit(moment);
     }
 }
 
-void ShipManager::cleanup()
+void TimeEaters::eatTime(const double now)
 {
-    ::cleanup(_ships);
+    foreach(const auto& eater, _eaters)
+    {
+        if( shared_ptr<TimeEater> eaterLocked = eater.lock() )
+            eaterLocked->eatTimeUpTo(now);
+    }
+}
+
+void TimeEaters::cleanUp()
+{
+    ::cleanup(_eaters);
 }

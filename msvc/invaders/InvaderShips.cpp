@@ -50,7 +50,7 @@ void RegularBomber::eatTime(const double from, const double to)
     _motion.updatePoint(_posX, to);
 }
 
-bool RegularBomber::flewAway()
+bool RegularBomber::timeToDie()
 {
     return _posX < _xrange.first || _posX > _xrange.second;
 }

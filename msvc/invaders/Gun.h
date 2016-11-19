@@ -9,7 +9,7 @@
 class Gun: public Drawable, public TimeEater
 {
 public:
-    Gun(InputProcessor& input, const DisplayRect& area);
+    Gun(const DisplayRect& area);
     ~Gun();
 
     static int height(); // gun's height on display

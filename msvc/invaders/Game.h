@@ -6,51 +6,110 @@
 #include "StatusLine.h"
 #include "SweetHome.h"
 #include "Sky.h"
-#include "InvaderShips.h"
 
-
-typedef std::deque< weak_ptr<TimeEater> > TimeEaters;
-
-class ShipManager: public TimeEater, public Drawable
-{
-public:
-    ShipManager(const shared_ptr<Sky>& sky, TimeEaters& timeEaters);
-    ~ShipManager();
-
-    virtual void eatTime(const double from, const double to);
-    virtual void drawYourself(Viewport& viewport);
-
-    void cleanup();
-
-private:
-    shared_ptr<Sky> _sky;
-    TimeEaters& _timeEaters;
-
-    double _left;
-
-    typedef shared_ptr<InvaderShip> ShipPtr;
-    deque<ShipPtr> _ships;
-};
 
 // Responsible for static (always existing) game objects and their layout
-struct GameStaticObjects: noncopyable
+struct GameStaticObjects: public Drawable, noncopyable
 {
-    GameStaticObjects(); // do not create objects
+    GameStaticObjects(const DisplayCoords& viewportSize, InputProcessor& input,
+        struct GameControllers& controllers);
     ~GameStaticObjects();
 
     // what minimal viewport size can accomodate all the objects
     static DisplayCoords minViewportSize();
-
-    // creates all objects
-    void init(const DisplayCoords& viewportSize, InputProcessor& input,
-        TimeEaters& timeEaters);
 
     // objects
     shared_ptr<StatusLine> statusLine;
     shared_ptr<Gun> gun;
     shared_ptr<SweetHome> sweetHome;
     shared_ptr<Sky> sky;
-    shared_ptr<ShipManager> shipManager;
+
+    // interfaces implementation
+    virtual void drawYourself(class Viewport& viewport);
+};
+
+class Cleaner: public Cleanee
+{
+public:
+    Cleaner(GameControllers& controllers);
+    ~Cleaner();
+
+    void put(const shared_ptr<Cleanee>& object);
+
+    virtual void cleanUp();
+
+private:
+    GameControllers& _controllers;
+    deque<weak_ptr<Cleanee>> _objects;
+};
+
+class TimeEaters: public Cleanee, noncopyable
+{
+public:
+    TimeEaters();
+    ~TimeEaters();
+
+    void put(const shared_ptr<TimeEater>& object);
+    void initAll(const double moment);
+    void eatTime(const double now);
+    virtual void cleanUp();
+
+private:
+    deque<weak_ptr<TimeEater>> _eaters;
+};
+
+class Screenplay: public noncopyable
+{
+public:
+    Screenplay(GameControllers& controllers);
+    ~Screenplay();
+
+    void start(const shared_ptr<Sky>& sky, const double moment);
+
+    void play(const double moment);
+
+private:
+    GameControllers& _controllers;
+    shared_ptr<Sky> _sky;
+
+    double _lastShipBirth {};
+};
+
+class TransientsManager: public Drawable, public Cleanee, noncopyable
+{
+public:
+    TransientsManager();
+    ~TransientsManager();
+
+    void put(const shared_ptr<TransientDrawable>& object);
+    void killThoseWhoseTimeHasCome();
+    virtual void drawYourself(Viewport& viewport);
+    virtual void cleanUp();
+
+private:
+    deque<shared_ptr<TransientDrawable>> _objects;
+};
+
+// Root game controllers: garbage collector, list of time eaters, etc
+struct GameControllers: noncopyable
+{
+    // number of current frame, starting with 0
+    long long frameCounter = 0;
+
+    // manages object who need to be cleaned sometimes
+    Cleaner cleaner;
+
+    // all the time eaters
+    TimeEaters timeEaters;
+
+    // all transient objects
+    TransientsManager transients;
+
+    // screenplay object
+    Screenplay screenplay;
+
+    GameControllers();
+    ~GameControllers();
 };
 
 class Game: noncopyable
@@ -66,19 +125,12 @@ private:
     DisplayCoords _viewportSize;
     InputProcessor _input;
 
-    long long _frameCounter;
-    
-    TimeEaters _timeEaters;
-
-    // static game objects
+    scoped_ptr<GameControllers> _controllers;
     scoped_ptr<GameStaticObjects> _objs;
 
-    void _init();
-    void _initStaticTimeEaters();
+    void _init(const double moment);
 
-    void _updateStateByTime();
     void _buildFrame();
-    void _cleanup();
 
     bool _exitGameSignal = false;
     void _onExitGame();

@@ -15,7 +15,7 @@ static const array<wstring, 3> IMAGE = {
     L"[==••••==]",
 };
 
-Gun::Gun(InputProcessor& input, const DisplayRect& area):
+Gun::Gun(const DisplayRect& area):
     TimeEater(willBeInitedLater),
 
     _positionY(area.tl.y),
@@ -30,9 +30,6 @@ Gun::Gun(InputProcessor& input, const DisplayRect& area):
     _shooting(false),
     _imageShooting(IMAGE, CharAttr(DisplayColor_lightRed, DisplayColor_black))
 {
-    input.listenGunMoveModeChange(bind(&Gun::commandMove, this, _1));
-    input.listenGunFireModeChange(bind(&Gun::commandFire, this, _1));
-
     const double gunHalfWidth = _image.size().x / 2;
 
     _xrange = make_pair(area.tl.x, area.br.x);
