@@ -11,6 +11,9 @@ static const int CLEAN_UP_EVERY_NTH_FRAME = static_cast<int>(FPS) * 5; // every 
 // Gun options
 static const double GUN_MAX_SPEED = 150; // coords/sec
 static const double GUN_SPEEDUP_TIME = 0.4; // time to achieve max speed, sec
+static const double GUN_SHELL_SPEED = 20; // shell speed
+static const double GUN_DIST_AFTER_FIRST = 2;
+static const double GUN_DIST_IN_BIRST = 1;
 
 // Status line colors
 static const DisplayColor STATUS_LINE_BK   = DisplayColor_purple;

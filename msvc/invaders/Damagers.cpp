@@ -32,3 +32,29 @@ bool Bomb::timeToDie()
 {
     return _posY >= 35; // TODO implement!
 }
+
+GunShell::GunShell(const double shotAtX, const double shotAtY, const double moment):
+    TimeEater(moment)
+{
+    _motion = UniformMotion1D(shotAtY, moment, -GUN_SHELL_SPEED);
+    _motion.updatePoint(_posY, moment);
+    _posX = shotAtX;
+}
+
+GunShell::~GunShell()
+{}
+
+void GunShell::eatTime(const double from, const double to)
+{
+    _motion.updatePoint(_posY, to);
+}
+
+void GunShell::drawYourself(Viewport& viewport)
+{
+    viewport.drawTextLine(L"*", {_posX, _posY});
+}
+
+bool GunShell::timeToDie()
+{
+    return _posY < 0; // TODO implement!
+}

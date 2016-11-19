@@ -133,7 +133,7 @@ GameStaticObjects::GameStaticObjects(const DisplayCoords& viewportSize,
 
     layout.gap(1);
 
-    gun.reset(new Gun{layout.nextField(Gun::height())});
+    gun.reset(new Gun{controllers, layout.nextField(Gun::height())});
     controllers.timeEaters.put(gun);
     input.listenGunMoveModeChange(bind(&Gun::commandMove, gun.get(), _1));
     input.listenGunFireModeChange(bind(&Gun::commandFire, gun.get(), _1));

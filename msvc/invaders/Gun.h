@@ -9,7 +9,7 @@
 class Gun: public Drawable, public TimeEater, noncopyable
 {
 public:
-    Gun(const DisplayRect& area);
+    Gun(struct GameControllers& controllers, const DisplayRect& area);
     ~Gun();
 
     static int height(); // gun's height on display
@@ -22,7 +22,8 @@ public:
     void commandMove(const Command<InputController::MoveMode>& state);
 
 private:
-    // consts
+    struct GameControllers& _controllers;
+
     double _positionY;
     pair<double, double> _xrange;
 
@@ -34,7 +35,12 @@ private:
     // picture
     Sprite _image;
 
+    int _shootNo = 0;
+    double _shootMoment = 0;
+    void _shoot(const double moment);
+    void _shootBarrel(const double moment, int barrelNo);
+    void _autoShootIfTime(const double moment);
+
     // TODO temp, to debug
-    bool _shooting;
     Sprite _imageShooting;
 };
