@@ -67,7 +67,7 @@ void RegularBomber::eatTime(const double from, const double to)
     if( _timeToBombSaddam(to) )
     {
         shared_ptr<Bomb> bomb {new Bomb{
-            _posX + REGULAR_BOMBER_BOMB_POINT.x, _posY + REGULAR_BOMBER_BOMB_POINT.y + 1,
+            _posX + REGULAR_BOMBER_BOMB_POINT.x, _posY + REGULAR_BOMBER_BOMB_POINT.y + 2,
             to
         }};
         _controllers.transients.put(bomb);
