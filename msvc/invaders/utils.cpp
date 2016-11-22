@@ -5,6 +5,9 @@ timers::Now g_now;
 
 boost::random::mt19937 g_random;
 
+thread_specific_ptr<shared_ptr<Smartobject>>
+    Smartobject::s_nowCreatingObject(&doNothing<shared_ptr<Smartobject>>);
+
 struct UnreachableException: public std::exception
 {
     UnreachableException(const char* codePlaceID):

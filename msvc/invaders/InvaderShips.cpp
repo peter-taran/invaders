@@ -66,10 +66,10 @@ void RegularBomber::eatTime(const double from, const double to)
 
     if( _timeToBombSaddam(to) )
     {
-        shared_ptr<Bomb> bomb {new Bomb{
-            _posX + REGULAR_BOMBER_BOMB_POINT.x, _posY + REGULAR_BOMBER_BOMB_POINT.y + 2,
+        shared_ptr<Bomb> bomb = Smartobject::create<Bomb>(
+            _posX + REGULAR_BOMBER_BOMB_POINT.x, _posY + REGULAR_BOMBER_BOMB_POINT.y + 1,
             to
-        }};
+        );
         _controllers.transients.put(bomb);
         _controllers.timeEaters.put(bomb);
         _bombDropped = true;

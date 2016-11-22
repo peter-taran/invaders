@@ -80,3 +80,51 @@ void cleanup(deque< shared_ptr<Type> >& elems)
     }
     elems.swap(copied);
 }
+
+struct SmartobjectBase: noncopyable
+{
+    
+};
+
+// Smartpointer-controlled object, having it's own smart pointer
+class Smartobject: private SmartobjectBase
+{
+    static thread_specific_ptr<shared_ptr<Smartobject>> s_nowCreatingObject;
+
+    weak_ptr<Smartobject> _selfPtr;
+
+protected:
+    Smartobject():
+        _selfPtr(*s_nowCreatingObject.get())
+    {}
+
+    template<class Result>
+    shared_ptr<Result> _self()
+    {
+        return static_pointer_cast<Result>(_selfPtr.lock());
+    }
+
+public:
+    // create smartpointed object
+    template<class Class, class... Args>
+    static shared_ptr<Class> create(Args... args)
+    {
+        void* memory = new std::aligned_storage_t<sizeof(Class), alignof(Class)>;
+
+        // from this point and up to end of construction we must have no exception
+        shared_ptr<Class> result(static_cast<Class*>(memory));
+
+        try
+        {
+            s_nowCreatingObject.reset(&shared_ptr<Smartobject>(result));
+            new(memory) Class(args...);
+        }
+        catch(...)
+        {
+            // TODO abort process because of result variable cannot be correctly destructed
+            throw;
+        }
+        s_nowCreatingObject.release();
+        return result;
+    }
+};

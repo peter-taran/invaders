@@ -3,11 +3,14 @@
 #include "Kinetic.h"
 
 
-class Bomb: public TransientDrawable, public TimeEater
+class Bomb: public TransientDrawable, public TimeEater, public Smartobject
 {
 public:
-    Bomb(const double droppedAtX, const double droppedAtY, const double moment);
     ~Bomb();
+
+protected:
+    friend Smartobject; // create objects with Smartobject::create
+    Bomb(const double droppedAtX, const double droppedAtY, const double moment);
 
 private:
     double _posX = 0, _posY = 0;
@@ -19,11 +22,14 @@ private:
 };
 
 
-class GunShell: public TransientDrawable, public TimeEater
+class GunShell: public TransientDrawable, public TimeEater, public Smartobject
 {
 public:
-    GunShell(const double shotAtX, const double shotAtY, const double moment);
     ~GunShell();
+
+protected:
+    friend Smartobject; // create objects with Smartobject::create
+    GunShell(const double shotAtX, const double shotAtY, const double moment);
 
 private:
     double _posX = 0, _posY = 0;

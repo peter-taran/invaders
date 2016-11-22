@@ -169,11 +169,11 @@ void Gun::_shootBarrel(const double moment, int barrelNo)
 {
     ++_shootNo;
     const int dispX = physToDisp(_positionX - MIDDLE_POINT_X);
-    shared_ptr<GunShell> shell {new GunShell{
+    shared_ptr<GunShell> shell = Smartobject::create<GunShell>(
         dispToPhys(dispX) + LEFT_BARREL_X + barrelNo,
         _positionY,
         moment
-    }};
+    );
     _controllers.timeEaters.put(shell);
     _controllers.transients.put(shell);
 }

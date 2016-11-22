@@ -37,6 +37,7 @@ using boost::scoped_array;
 
 #include <boost/shared_ptr.hpp>
 using boost::shared_ptr;
+using boost::static_pointer_cast;
 
 #include <boost/weak_ptr.hpp>
 using boost::weak_ptr;
@@ -75,6 +76,9 @@ using boost::format;
 using boost::random::uniform_real_distribution;
 using boost::random::uniform_int_distribution;
 using boost::random::discrete_distribution;
+
+#include <boost/thread/tss.hpp>
+using boost::thread_specific_ptr;
 
 #include <vector>
 using std::vector;
