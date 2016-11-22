@@ -81,13 +81,8 @@ void cleanup(deque< shared_ptr<Type> >& elems)
     elems.swap(copied);
 }
 
-struct SmartobjectBase: noncopyable
-{
-    
-};
-
 // Smartpointer-controlled object, having it's own smart pointer
-class Smartobject: private SmartobjectBase
+class Smartobject: noncopyable
 {
     static thread_specific_ptr<shared_ptr<Smartobject>> s_nowCreatingObject;
 
